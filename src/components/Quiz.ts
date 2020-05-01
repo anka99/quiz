@@ -3,29 +3,30 @@ import { QuizTemplate } from "../templates/QuizTemplate.js";
 import EntryWindow from "./EntryWindow.js";
 import State from "./State.js";
 import Button from "./Button.js";
+import AnswerContainer from "./AnswerContainer.js";
+import GiveUpWindow from "./GiveUpWindow.js";
+import FinishedWindow from "./FinishedWindow.js";
 
 class Quiz {
   private questions: Array<Question>;
   private title: string;
+
   private nextButton: Button;
   private backButton: Button;
   private giveUpButton: Button;
   private finishQuizButton: Button;
+  private restartButton: Button;
   private endQuiz: HTMLElement;
   private state: State;
   private startButton: Button;
+  private answers: AnswerContainer;
 
   constructor(template: QuizTemplate) {
-    let i = 0;
     this.title = template.quiz_title;
     this.questions = new Array(template.questions.length);
 
-    template.questions.forEach((element) => {
-      this.questions[i] = new Question(element);
-      i++;
-    });
-
     this.startButton = new Button(
+      "start",
       "start",
       "start",
       this.rerender(false, 0, false, false)
@@ -34,16 +35,47 @@ class Quiz {
     this.backButton = new Button(
       "back",
       "back",
+      "back",
       this.rerender(false, -1, false, false)
     );
 
     this.nextButton = new Button(
       "next",
       "next",
+      "next",
       this.rerender(false, 1, false, false)
     );
 
+    this.giveUpButton = new Button(
+      "giveup",
+      "giveup",
+      "give up",
+      this.rerender(false, 0, true, false)
+    );
+
+    this.finishQuizButton = new Button(
+      "finish",
+      "finish",
+      "finish",
+      this.rerender(false, 0, false, true)
+    );
+
+    this.restartButton = new Button(
+      "restart",
+      "restart",
+      "restart",
+      this.restart
+    );
+
     this.state = new State(0, true, false, false);
+
+    this.answers = new AnswerContainer(this.questions.length);
+
+    let i = 0;
+    template.questions.forEach((element) => {
+      this.questions[i] = new Question(element, this.answers, i);
+      i++;
+    });
   }
 
   private renderCurrentQuestion() {
@@ -65,6 +97,12 @@ class Quiz {
     this.render();
   };
 
+  private restart = () => {
+    this.answers.clear();
+    this.state.currentQuestion = 0;
+    this.rerender(true, 0, false, false)();
+  };
+
   render() {
     let rendered = document.createElement("div");
     rendered.setAttribute("class", "main-page-grid");
@@ -74,15 +112,18 @@ class Quiz {
       rendered.appendChild(EntryWindow.render());
       rendered.appendChild(this.startButton.render());
     } else if (this.state.givenUp) {
-      //TODO
+      rendered.appendChild(GiveUpWindow.render());
+      rendered.appendChild(this.restartButton.render());
     } else if (this.state.quizFinished) {
-      //TODO
+      rendered.appendChild(FinishedWindow.render());
+      rendered.appendChild(this.restartButton.render());
     } else {
       rendered.appendChild(this.renderCurrentQuestion());
       if (this.state.currentQuestion > 0) {
         rendered.appendChild(this.backButton.render());
       }
-      // rendered.appendChild(this.giveUpButton.render());
+      rendered.appendChild(this.giveUpButton.render());
+      rendered.appendChild(this.finishQuizButton.render());
       if (this.state.currentQuestion < this.questions.length - 1) {
         rendered.appendChild(this.nextButton.render());
       }
@@ -93,6 +134,8 @@ class Quiz {
     document
       .querySelector("body")
       .insertBefore(rendered, document.getElementById("script"));
+
+    this.answers.render();
   }
 }
 

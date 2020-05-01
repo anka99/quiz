@@ -1,16 +1,25 @@
 import { QuestionTemplate } from "../templates/QuestionTemplate.js";
+import AnswerContainer from "./AnswerContainer.js";
 
 class Question {
   private question: string;
   private correct_answer: string;
   private users_answer: string;
   private penalty: number;
+  private id: number;
+  private answerContainer: AnswerContainer;
 
-  constructor(template: QuestionTemplate) {
+  constructor(
+    template: QuestionTemplate,
+    answerContainer: AnswerContainer,
+    id: number
+  ) {
     this.question = template.question;
     this.correct_answer = template.answer;
     this.users_answer = "";
     this.penalty = template.penalty;
+    this.id = id;
+    this.answerContainer = answerContainer;
   }
 
   render(): HTMLElement {
@@ -30,6 +39,11 @@ class Question {
 
     let questionInput = document.createElement("input");
     questionInput.type = "text";
+
+    questionInput.addEventListener(
+      "input",
+      this.answerContainer.actualizeAswer(this.id)
+    );
 
     questionPenalty.appendChild(penaltyText);
     questionContainer.appendChild(questionText);
