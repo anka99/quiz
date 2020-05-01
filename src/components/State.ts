@@ -3,6 +3,8 @@ class State {
   entryWindow: boolean;
   quizFinished: boolean;
   givenUp: boolean;
+  time: number;
+  interval: number;
 
   constructor(
     currentQuestion: number,
@@ -14,6 +16,8 @@ class State {
     this.entryWindow = entryWindow;
     this.quizFinished = quizFinished;
     this.givenUp = givenUp;
+    this.time = 0;
+    this.interval = null;
   }
 }
 

@@ -3,8 +3,7 @@ import AnswerContainer from "./AnswerContainer.js";
 
 class Question {
   private question: string;
-  private correct_answer: string;
-  private users_answer: string;
+  private correctAswer: string;
   private penalty: number;
   private id: number;
   private answerContainer: AnswerContainer;
@@ -15,11 +14,14 @@ class Question {
     id: number
   ) {
     this.question = template.question;
-    this.correct_answer = template.answer;
-    this.users_answer = "";
+    this.correctAswer = template.answer;
     this.penalty = template.penalty;
     this.id = id;
     this.answerContainer = answerContainer;
+  }
+
+  public get correctAnswer(): string {
+    return this.correctAnswer;
   }
 
   render(): HTMLElement {
@@ -50,6 +52,13 @@ class Question {
     questionContainer.appendChild(questionPenalty);
     questionContainer.appendChild(questionInput);
     return questionContainer;
+  }
+
+  checkAnswer(answer: string): number {
+    if (answer === this.correctAswer) {
+      return 0;
+    }
+    return this.penalty;
   }
 }
 

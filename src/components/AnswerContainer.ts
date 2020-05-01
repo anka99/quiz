@@ -1,3 +1,5 @@
+import Question from "./Question";
+
 class AnswerContainer {
   private answers: string[];
   private filled: number;
@@ -10,8 +12,15 @@ class AnswerContainer {
     this.filled = 0;
   }
 
+  getAnswer(i: number) {
+    return this.answers[i];
+  }
+
   private validAnswer(answer: string): boolean {
-    let regex = new RegExp("^[0-9]*$");
+    if (answer.length < 1 || answer === "-") {
+      return false;
+    }
+    let regex = new RegExp("^(-?)[0-9]*$");
     return regex.test(answer);
   }
 
@@ -40,9 +49,10 @@ class AnswerContainer {
   }
 
   render() {
-    console.log(this.filled);
-    console.log(this.answers);
+    // console.log(this.filled);
+    // console.log(this.answers);
     let finishButton = document.getElementById("finish");
+
     if (finishButton) {
       if (this.filled == this.answers.length) {
         finishButton.removeAttribute("disabled");

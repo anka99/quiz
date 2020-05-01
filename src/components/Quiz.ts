@@ -6,6 +6,7 @@ import Button from "./Button.js";
 import AnswerContainer from "./AnswerContainer.js";
 import GiveUpWindow from "./GiveUpWindow.js";
 import FinishedWindow from "./FinishedWindow.js";
+import Timer from "./Timer.js";
 
 class Quiz {
   private questions: Array<Question>;
@@ -16,48 +17,53 @@ class Quiz {
   private giveUpButton: Button;
   private finishQuizButton: Button;
   private restartButton: Button;
-  private endQuiz: HTMLElement;
   private state: State;
   private startButton: Button;
   private answers: AnswerContainer;
+  private timer: Timer;
+  private score: number;
 
   constructor(template: QuizTemplate) {
     this.title = template.quiz_title;
     this.questions = new Array(template.questions.length);
+    this.score = 0;
+    this.state = new State(0, true, false, false);
+
+    this.timer = new Timer(this.state);
 
     this.startButton = new Button(
       "start",
       "start",
       "start",
-      this.rerender(false, 0, false, false)
+      this.rerender(false, 0, false, false, this.timer.start)
     );
 
     this.backButton = new Button(
       "back",
       "back",
       "back",
-      this.rerender(false, -1, false, false)
+      this.rerender(false, -1, false, false, () => {})
     );
 
     this.nextButton = new Button(
       "next",
       "next",
       "next",
-      this.rerender(false, 1, false, false)
+      this.rerender(false, 1, false, false, () => {})
     );
 
     this.giveUpButton = new Button(
       "giveup",
       "giveup",
       "give up",
-      this.rerender(false, 0, true, false)
+      this.rerender(false, 0, true, false, this.timer.stop)
     );
 
     this.finishQuizButton = new Button(
       "finish",
       "finish",
       "finish",
-      this.rerender(false, 0, false, true)
+      this.rerender(false, 0, false, true, this.timer.stop)
     );
 
     this.restartButton = new Button(
@@ -66,8 +72,6 @@ class Quiz {
       "restart",
       this.restart
     );
-
-    this.state = new State(0, true, false, false);
 
     this.answers = new AnswerContainer(this.questions.length);
 
@@ -78,15 +82,16 @@ class Quiz {
     });
   }
 
-  private renderCurrentQuestion() {
+  private renderCurrentQuestion = () => {
     return this.questions[this.state.currentQuestion].render();
-  }
+  };
 
   private rerender = (
     entryWindow: boolean,
     increaseQuestion: number,
     givenUp: boolean,
-    quizFinished: boolean
+    quizFinished: boolean,
+    timeOperation: () => void
   ) => () => {
     this.state = new State(
       this.state.currentQuestion + increaseQuestion,
@@ -94,14 +99,26 @@ class Quiz {
       quizFinished,
       givenUp
     );
+    timeOperation();
     this.render();
   };
 
   private restart = () => {
     this.answers.clear();
     this.state.currentQuestion = 0;
-    this.rerender(true, 0, false, false)();
+    this.score = 0;
+    this.rerender(true, 0, false, false, this.timer.reset)();
   };
+
+  private countTime(): number {
+    let time = this.timer.seconds;
+    let i = 0;
+    this.questions.forEach((q) => {
+      time += q.checkAnswer(this.answers.getAnswer(i));
+      i++;
+    });
+    return time;
+  }
 
   render() {
     let rendered = document.createElement("div");
@@ -115,9 +132,11 @@ class Quiz {
       rendered.appendChild(GiveUpWindow.render());
       rendered.appendChild(this.restartButton.render());
     } else if (this.state.quizFinished) {
-      rendered.appendChild(FinishedWindow.render());
+      let time = this.countTime();
+      rendered.appendChild(FinishedWindow.render(time));
       rendered.appendChild(this.restartButton.render());
     } else {
+      rendered.appendChild(this.timer.render());
       rendered.appendChild(this.renderCurrentQuestion());
       if (this.state.currentQuestion > 0) {
         rendered.appendChild(this.backButton.render());
@@ -135,7 +154,9 @@ class Quiz {
       .querySelector("body")
       .insertBefore(rendered, document.getElementById("script"));
 
-    this.answers.render();
+    if (!this.state.givenUp && !this.state.entryWindow) {
+      this.answers.render();
+    }
   }
 }
 
