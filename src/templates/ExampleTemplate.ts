@@ -11,5 +11,10 @@ export const template = {
       answer: "0",
       penalty: 1,
     },
+    {
+      question: "42 * 2",
+      answer: "84",
+      penalty: 3,
+    },
   ],
 };

@@ -1,4 +1,4 @@
-class Entry {
+class EntryWindow {
   static render() {
     let el = document.createElement("div");
     let text = document.createElement("p");
@@ -8,4 +8,4 @@ class Entry {
   }
 }
 
-export default Entry;
+export default EntryWindow;

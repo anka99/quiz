@@ -1,19 +1,19 @@
 import Question from "./Question.js";
 import { QuizTemplate } from "../templates/QuizTemplate.js";
-import Entry from "./Entry.js";
+import EntryWindow from "./EntryWindow.js";
+import State from "./State.js";
+import Button from "./Button.js";
 
 class Quiz {
   private questions: Array<Question>;
   private title: string;
-  private next: HTMLElement;
-  private back: HTMLElement;
-  private giveUp: HTMLElement;
-  private endQuizz: HTMLElement;
-  private currentQuestion: number;
-  private entryWindow: boolean;
-  private quizFinished: boolean;
-  private givenUp: boolean;
-  private startButton: HTMLElement;
+  private nextButton: Button;
+  private backButton: Button;
+  private giveUpButton: Button;
+  private finishQuizButton: Button;
+  private endQuiz: HTMLElement;
+  private state: State;
+  private startButton: Button;
 
   constructor(template: QuizTemplate) {
     let i = 0;
@@ -22,28 +22,46 @@ class Quiz {
 
     template.questions.forEach((element) => {
       this.questions[i] = new Question(element);
+      i++;
     });
 
-    this.currentQuestion = 0;
-    this.entryWindow = true;
-    this.givenUp = false;
-    this.startButton = document.createElement("button");
-    this.startButton.innerHTML = "start";
-    this.startButton.addEventListener("click", this.rerender(false, 0, false));
+    this.startButton = new Button(
+      "start",
+      "start",
+      this.rerender(false, 0, false, false)
+    );
+
+    this.backButton = new Button(
+      "back",
+      "back",
+      this.rerender(false, -1, false, false)
+    );
+
+    this.nextButton = new Button(
+      "next",
+      "next",
+      this.rerender(false, 1, false, false)
+    );
+
+    this.state = new State(0, true, false, false);
   }
 
   private renderCurrentQuestion() {
-    return this.questions[this.currentQuestion].render();
+    return this.questions[this.state.currentQuestion].render();
   }
 
   private rerender = (
     entryWindow: boolean,
-    currentQuestion: number,
-    givenUp: boolean
+    increaseQuestion: number,
+    givenUp: boolean,
+    quizFinished: boolean
   ) => () => {
-    this.entryWindow = entryWindow;
-    this.currentQuestion = currentQuestion;
-    this.givenUp = givenUp;
+    this.state = new State(
+      this.state.currentQuestion + increaseQuestion,
+      entryWindow,
+      quizFinished,
+      givenUp
+    );
     this.render();
   };
 
@@ -52,13 +70,22 @@ class Quiz {
     rendered.setAttribute("class", "main-page-grid");
     rendered.setAttribute("id", "main-page-grid");
 
-    if (this.entryWindow) {
-      rendered.appendChild(Entry.render());
-      rendered.appendChild(this.startButton);
-    } else if (this.givenUp) {
+    if (this.state.entryWindow) {
+      rendered.appendChild(EntryWindow.render());
+      rendered.appendChild(this.startButton.render());
+    } else if (this.state.givenUp) {
+      //TODO
+    } else if (this.state.quizFinished) {
       //TODO
     } else {
       rendered.appendChild(this.renderCurrentQuestion());
+      if (this.state.currentQuestion > 0) {
+        rendered.appendChild(this.backButton.render());
+      }
+      // rendered.appendChild(this.giveUpButton.render());
+      if (this.state.currentQuestion < this.questions.length - 1) {
+        rendered.appendChild(this.nextButton.render());
+      }
     }
     document
       .querySelector("body")
