@@ -1,0 +1,23 @@
+{
+  "name": "quiz",
+  "version": "1.0.0",
+  "description": "1st assignment for the Web Applications course at the University of Warsaw (2nd year BSc in Computer Science).",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anka99/quiz.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/anka99/quiz/issues"
+  },
+  "homepage": "https://github.com/anka99/quiz#readme",
+  "dependencies": {
+    "bulma": "^0.8.2"
+  }
+}

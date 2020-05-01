@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "es2016",
+    "removeComments": true,
+    "sourceMap": true,
+    "lib": ["es5", "DOM", "ES2015"],
+    "outDir": "src/public",
+    "listFiles": false,
+    "watch": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "src/public/**/*"]
+}
