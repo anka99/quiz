@@ -1,8 +1,9 @@
 class GiveUpWindow {
   static render() {
     let el = document.createElement("div");
-    let text = document.createElement("p");
-    text.textContent = "fucking looser";
+    el.setAttribute("class", "loooser");
+    let text = document.createElement("h1");
+    text.textContent = "Try again!";
     el.appendChild(text);
     return el;
   }

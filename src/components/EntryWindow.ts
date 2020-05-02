@@ -1,8 +1,9 @@
 class EntryWindow {
   static render() {
     let el = document.createElement("div");
-    let text = document.createElement("p");
-    text.textContent = "start ur quiz";
+    el.setAttribute("class", "rules");
+    let text = document.createElement("h1");
+    text.textContent = "rules";
     el.appendChild(text);
     return el;
   }

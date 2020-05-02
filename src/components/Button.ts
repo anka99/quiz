@@ -18,7 +18,7 @@ class Button {
   render(): HTMLElement {
     let button = document.createElement("button");
     button.innerHTML = this.innerHTML;
-    button.setAttribute("class", this.className);
+    button.setAttribute("class", this.className + " button");
     button.setAttribute("id", this.id);
     button.addEventListener("click", this.onClick);
     return button;

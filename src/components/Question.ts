@@ -28,28 +28,23 @@ class Question {
     let questionContainer = document.createElement("div");
     questionContainer.className = "question-container";
 
-    let questionPenalty = document.createElement("div");
-    questionPenalty.className = "question-penalty";
-
-    let penaltyText = document.createElement("p");
-    penaltyText.textContent = "Penalty for incorrect answer is " + this.penalty;
-    penaltyText.className = "penalty-text";
-
-    let questionText = document.createElement("p");
+    let questionText = document.createElement("h2");
     questionText.className = "question-text";
-    questionText.textContent = this.question;
+    questionText.textContent =
+      this.question +
+      " = ? Time penalty for incorrect answer is " +
+      this.penalty;
 
     let questionInput = document.createElement("input");
     questionInput.type = "text";
+    questionInput.setAttribute("class", "input");
 
     questionInput.addEventListener(
       "input",
       this.answerContainer.actualizeAswer(this.id)
     );
 
-    questionPenalty.appendChild(penaltyText);
     questionContainer.appendChild(questionText);
-    questionContainer.appendChild(questionPenalty);
     questionContainer.appendChild(questionInput);
     return questionContainer;
   }

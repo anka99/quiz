@@ -21,15 +21,13 @@ class Quiz {
   private startButton: Button;
   private answers: AnswerContainer;
   private timer: Timer;
-  private score: number;
 
   constructor(template: QuizTemplate) {
     this.title = template.quiz_title;
     this.questions = new Array(template.questions.length);
-    this.score = 0;
     this.state = new State(0, true, false, false);
 
-    this.timer = new Timer(this.state);
+    this.timer = new Timer();
 
     this.startButton = new Button(
       "start",
@@ -67,7 +65,7 @@ class Quiz {
     );
 
     this.restartButton = new Button(
-      "restart",
+      "start",
       "restart",
       "restart",
       this.restart
@@ -106,7 +104,6 @@ class Quiz {
   private restart = () => {
     this.answers.clear();
     this.state.currentQuestion = 0;
-    this.score = 0;
     this.rerender(true, 0, false, false, this.timer.reset)();
   };
 
@@ -120,10 +117,20 @@ class Quiz {
     return time;
   }
 
+  renderHeader() {
+    let headerDiv = document.createElement("div");
+    let header = document.createElement("h1");
+    headerDiv.setAttribute("class", "header");
+    header.innerText = this.title;
+    headerDiv.appendChild(header);
+    return headerDiv;
+  }
+
   render() {
     let rendered = document.createElement("div");
     rendered.setAttribute("class", "main-page-grid");
     rendered.setAttribute("id", "main-page-grid");
+    rendered.appendChild(this.renderHeader());
 
     if (this.state.entryWindow) {
       rendered.appendChild(EntryWindow.render());
@@ -136,6 +143,9 @@ class Quiz {
       rendered.appendChild(FinishedWindow.render(time));
       rendered.appendChild(this.restartButton.render());
     } else {
+      rendered.appendChild(
+        this.answers.renderPreviousAnswer(this.state.currentQuestion)
+      );
       rendered.appendChild(this.timer.render());
       rendered.appendChild(this.renderCurrentQuestion());
       if (this.state.currentQuestion > 0) {

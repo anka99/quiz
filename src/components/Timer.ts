@@ -3,48 +3,49 @@ import { numberToTime } from "../tools/timeTools.js";
 
 class Timer {
   private element: HTMLElement;
-  private state: State;
+  private time: number;
+  private interval: number;
 
-  constructor(state: State) {
+  constructor() {
+    this.time = 0;
+    this.interval = null;
     this.element = document.createElement("div");
     this.element.setAttribute("class", "timer-place");
-    let timerText = document.createElement("h2");
+    let timerText = document.createElement("h1");
     timerText.setAttribute("id", "timer");
     timerText.innerText = "00:00";
-
     this.element.appendChild(timerText);
-    this.state = state;
   }
 
   public get seconds(): number {
-    return this.state.time;
+    return this.time;
   }
 
   update = () => {
     let timerText: HTMLHeadingElement = this.element.querySelector("#timer");
-    timerText.innerText = numberToTime(this.state.time);
+    timerText.innerText = numberToTime(this.time);
   };
 
   start = () => {
-    if (!this.state.interval) {
-      this.state.interval = window.setInterval(() => {
-        this.state.time++;
+    if (!this.interval) {
+      this.interval = window.setInterval(() => {
+        this.time++;
         this.update();
       }, 1000);
     }
   };
 
   stop = () => {
-    if (this.state.interval) {
-      window.clearInterval(this.state.interval);
-      this.state.interval = null;
+    if (this.interval) {
+      window.clearInterval(this.interval);
+      this.interval = null;
     }
-    console.log(this.state.time);
+    console.log(this.time);
   };
 
   reset = () => {
     this.stop;
-    this.state.time = 0;
+    this.time = 0;
     this.update();
   };
 

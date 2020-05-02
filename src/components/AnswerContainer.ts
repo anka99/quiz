@@ -1,5 +1,3 @@
-import Question from "./Question";
-
 class AnswerContainer {
   private answers: string[];
   private filled: number;
@@ -48,9 +46,40 @@ class AnswerContainer {
     this.filled = 0;
   }
 
+  renderBar(): HTMLElement {
+    let bar = document.createElement("div");
+    bar.setAttribute("class", "answer-bar");
+    let barItems = new Array(length);
+    let i = 0;
+    this.answers.forEach((a) => {
+      i++;
+      let el = document.createElement("div");
+      let num = document.createElement("h2");
+      num.innerText = i.toString();
+      if (this.answers[i - 1] == "empty") {
+        el.setAttribute("class", "bar-item");
+      } else {
+        el.setAttribute("class", "bar-item-empty");
+      }
+      el.appendChild(num);
+      bar.appendChild(el);
+    });
+
+    return bar;
+  }
+
+  renderPreviousAnswer(i: number): HTMLElement {
+    let el = document.createElement("div");
+    if (this.answers[i] != "empty") {
+      el.setAttribute("class", "prev-ans");
+      let text = document.createElement("h2");
+      text.innerText = "Your answer:\n" + this.answers[i];
+      el.appendChild(text);
+    }
+    return el;
+  }
+
   render() {
-    // console.log(this.filled);
-    // console.log(this.answers);
     let finishButton = document.getElementById("finish");
 
     if (finishButton) {
