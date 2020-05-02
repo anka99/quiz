@@ -3,11 +3,17 @@
   grid-template-columns: repeat(6, 1fr);
   grid-gap: 10px;
   grid-template-rows: repeat(5, 1fr);
-  background-color: rgb(54, 9, 97);
+  background-color: inherit;
+  grid-template-areas:
+    "h h h h h h"
+    "t q q q q p"
+    "a q q q q m"
+    "a q q q q m"
+    "b g g g f n";
   padding: 2%;
 }
 body {
-  background-color: rgb(54, 9, 97);
+  background-color: #201e1f;
 }
 h1 {
   font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
@@ -48,10 +54,9 @@ div {
   display: grid;
 }
 .header {
-  grid-column: 1 / 7;
-  grid-row: 1;
+  grid-area: h;
   text-align: center;
-  background-color: rgb(96, 175, 96);
+  background-color: #3b3561;
   align-self: stretch;
   justify-self: stretch;
   border-radius: 10px;
@@ -63,15 +68,14 @@ div {
   grid-row: 2 / 6;
   align-self: stretch;
   justify-self: stretch;
-  background-color: orange;
+  background-color: #7ebdc3;
   border-radius: 10px;
   display: grid;
 }
 
 .start {
-  grid-row: 5;
-  grid-column: 6;
-  background-color: rgb(76, 146, 252);
+  grid-area: n;
+  background-color: #ff4000;
 }
 
 .answers {
@@ -85,40 +89,34 @@ div {
 }
 
 .finish {
-  grid-row: 5;
-  grid-column: 5;
-  background-color: rgb(76, 146, 252);
+  grid-area: f;
+  background-color: #3b3561;
 }
 
 .finish:disabled {
-  grid-row: 5;
-  grid-column: 5;
-  background-color: rgb(130, 154, 190);
+  grid-area: f;
+  background-color: #9993ad;
 }
 
 .giveup {
-  grid-row: 5;
-  grid-column: 2 / 5;
-  background-color: rgb(209, 80, 80);
+  grid-area: g;
+  background-color: #ff4000;
   border-radius: 10px;
 }
 
 .next {
-  grid-row: 5;
-  grid-column: 6;
-  background-color: rgb(96, 175, 96);
+  grid-area: n;
+  background-color: #3b3561;
 }
 
 .back {
-  grid-row: 5;
-  grid-column: 1;
-  background-color: rgb(96, 175, 96);
+  grid-area: b;
+  background-color: #3b3561;
 }
 
 .timer-place {
   display: grid;
-  grid-row: 3;
-  grid-column: 6;
+  grid-area: t;
   text-transform: uppercase;
   font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
     "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
@@ -126,7 +124,7 @@ div {
   color: white;
   align-self: stretch;
   justify-self: stretch;
-  background-color: rgb(76, 146, 252);
+  background-color: #faaa8d;
   border-radius: 10px;
   border-style: non;
   padding: 2%;
@@ -136,8 +134,7 @@ div {
 
 .question-container {
   display: grid;
-  grid-row: 3/ 5;
-  grid-column: 1 / 6;
+  grid-area: q;
   text-transform: uppercase;
   font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
     "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
@@ -145,9 +142,9 @@ div {
   color: white;
   align-self: stretch;
   justify-self: stretch;
-  background-color: orange;
+  background-color: #7ebdc3;
   border-radius: 10px;
-  border-style: non;
+  border-style: none;
 
   align-content: center;
   justify-content: center;
@@ -155,8 +152,7 @@ div {
 
 .loooser {
   display: grid;
-  grid-row: 2 / 5;
-  grid-column: 2 / 6;
+  grid-area: q;
   text-transform: uppercase;
   font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
     "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
@@ -164,7 +160,7 @@ div {
   color: white;
   align-self: stretch;
   justify-self: stretch;
-  background-color: orange;
+  background-color: #faaa8d;
   border-radius: 10px;
   border-style: non;
 
@@ -172,14 +168,12 @@ div {
   justify-content: center;
 }
 .input {
-  width: 100%;
-  height: 100%;
+  width: 50%;
 }
 
 .prev-ans {
-  grid-row: 4;
-  grid-column: 6;
-  background-color: #6bd425;
+  grid-area: p;
+  background-color: #faaa8d;
   justify-content: center;
   align-content: center;
   padding: 1%;
@@ -209,4 +203,23 @@ div {
   align-self: stretch;
   justify-self: stretch;
   text-align: center;
+}
+
+@media screen and (max-width: 700px) {
+  .main-page-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-gap: 10px;
+    grid-template-rows: repeat(7, 1fr);
+    background-color: inherit;
+    grid-template-areas:
+      "h h"
+      "t p"
+      "q q"
+      "q q"
+      "q q"
+      "b n"
+      "g f";
+    padding: 2%;
+  }
 }
