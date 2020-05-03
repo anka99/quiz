@@ -1,5 +1,5 @@
 export const template = {
-  quiz_title: "First quiz",
+  quiz_title: "Quiz",
   questions: [
     {
       question: "1 + 1",

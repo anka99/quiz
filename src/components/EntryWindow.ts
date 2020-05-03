@@ -1,11 +1,14 @@
 class EntryWindow {
-  static render() {
-    let el = document.createElement("div");
-    el.setAttribute("class", "rules");
+  private element: HTMLElement;
+  constructor() {
+    this.element = document.createElement("div");
+    this.element.setAttribute("class", "rules");
     let text = document.createElement("h1");
     text.textContent = "rules";
-    el.appendChild(text);
-    return el;
+    this.element.appendChild(text);
+  }
+  render() {
+    return this.element;
   }
 }
 

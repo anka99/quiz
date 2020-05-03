@@ -1,11 +1,14 @@
 class GiveUpWindow {
-  static render() {
-    let el = document.createElement("div");
-    el.setAttribute("class", "loooser");
+  private element: HTMLElement;
+  constructor() {
+    this.element = document.createElement("div");
+    this.element.setAttribute("class", "loooser");
     let text = document.createElement("h1");
     text.textContent = "Try again!";
-    el.appendChild(text);
-    return el;
+    this.element.appendChild(text);
+  }
+  render() {
+    return this.element;
   }
 }
 export default GiveUpWindow;

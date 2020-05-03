@@ -1,5 +1,6 @@
 import { QuestionTemplate } from "../templates/QuestionTemplate.js";
 import AnswerContainer from "./AnswerContainer.js";
+import Timer from "./Timer.js";
 
 class Question {
   private question: string;
@@ -7,6 +8,7 @@ class Question {
   private penalty: number;
   private id: number;
   private answerContainer: AnswerContainer;
+  private timer: Timer;
 
   constructor(
     template: QuestionTemplate,
@@ -18,6 +20,7 @@ class Question {
     this.penalty = template.penalty;
     this.id = id;
     this.answerContainer = answerContainer;
+    this.timer = new Timer();
   }
 
   public get correctAnswer(): string {
