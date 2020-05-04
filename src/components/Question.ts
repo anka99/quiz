@@ -71,7 +71,8 @@ class Question {
     questionText.textContent =
       this.question +
       " = ? Time penalty for incorrect answer is " +
-      this.penalty;
+      this.penalty +
+      " seconds";
 
     let questionInput = document.createElement("input");
     questionInput.type = "text";
