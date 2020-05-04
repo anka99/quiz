@@ -7,8 +7,8 @@ class GiveUpWindow {
     text.textContent = "Try again!";
     this.element.appendChild(text);
   }
-  render() {
+  render = () => {
     return this.element;
-  }
+  };
 }
 export default GiveUpWindow;

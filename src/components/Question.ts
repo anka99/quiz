@@ -20,14 +20,49 @@ class Question {
     this.penalty = template.penalty;
     this.id = id;
     this.answerContainer = answerContainer;
-    this.timer = new Timer();
+    this.timer = new Timer("question-timer-place");
   }
 
   public get correctAnswer(): string {
     return this.correctAnswer;
   }
 
-  render(): HTMLElement {
+  public get questionId(): number {
+    return this.id;
+  }
+
+  stopTimer = (): void => {
+    this.timer.stop();
+  };
+
+  startTimer = (): void => {
+    this.timer.start();
+  };
+
+  resetTimer = (): void => {
+    this.timer.reset();
+  };
+
+  getTime = (): number => {
+    return this.timer.seconds;
+  };
+
+  getPenalty = (): number => {
+    return this.penalty;
+  };
+
+  getContet = (): string => {
+    return this.question;
+  };
+
+  checkAnswer = (answer: string): number => {
+    if (answer === this.correctAswer) {
+      return 0;
+    }
+    return this.penalty;
+  };
+
+  render = (): HTMLElement => {
     let questionContainer = document.createElement("div");
     questionContainer.className = "question-container";
 
@@ -50,14 +85,7 @@ class Question {
     questionContainer.appendChild(questionText);
     questionContainer.appendChild(questionInput);
     return questionContainer;
-  }
-
-  checkAnswer(answer: string): number {
-    if (answer === this.correctAswer) {
-      return 0;
-    }
-    return this.penalty;
-  }
+  };
 }
 
 export default Question;

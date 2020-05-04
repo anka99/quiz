@@ -1,6 +1,6 @@
 import { QuestionTemplate } from "./QuestionTemplate.js";
 
 export interface QuizTemplate {
-  quiz_title: string;
+  introduction: string;
   questions: QuestionTemplate[];
 }

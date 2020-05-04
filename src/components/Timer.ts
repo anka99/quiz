@@ -6,14 +6,14 @@ class Timer {
   private time: number;
   private interval: number;
 
-  constructor() {
+  constructor(className: string) {
     this.time = 0;
     this.interval = null;
     this.element = document.createElement("div");
-    this.element.setAttribute("class", "timer-place");
-    let timerText = document.createElement("h1");
+    this.element.setAttribute("class", className);
+    let timerText = document.createElement("h2");
     timerText.setAttribute("id", "timer");
-    timerText.innerText = "00:00";
+    timerText.innerText = "00:00:00";
     this.element.appendChild(timerText);
   }
 

@@ -3,6 +3,6 @@ import { template } from "./templates/ExampleTemplate.js";
 
 let quiz = new Quiz(template);
 
-// quiz.renderHeader();
+// localStorage.removeItem("scores");
 
 quiz.render();

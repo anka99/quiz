@@ -150,6 +150,15 @@ div {
   justify-content: center;
 }
 
+.question-container input {
+  background-color: inherit;
+  border: solid white;
+  font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
+    "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+  font-size: 20px;
+  color: white;
+  width: 50%;
+}
 .loooser {
   display: grid;
   grid-column: 1 / 4;
@@ -167,9 +176,6 @@ div {
 
   align-content: center;
   justify-content: center;
-}
-.input {
-  width: 50%;
 }
 
 .prev-ans {
@@ -211,7 +217,56 @@ div {
   background-color: #faaa8d;
 }
 
-@media screen and (max-width: 700px) {
+.save-stats {
+  grid-area: t;
+  background-color: #faaa8d;
+}
+
+.save-raw {
+  grid-area: p;
+  background-color: #faaa8d;
+}
+
+.scores-window {
+  display: grid;
+  grid-area: q;
+  text-transform: uppercase;
+  font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
+    "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+  font-size: 30px;
+  color: white;
+  align-self: stretch;
+  justify-self: stretch;
+  background-color: #7ebdc3;
+  border-radius: 10px;
+  border-style: none;
+
+  align-content: center;
+  justify-content: center;
+  padding: 2%;
+}
+
+.incorrect {
+  background-color: #ff4000;
+}
+
+.scores-table {
+  padding: 4%;
+  border-collapse: collapse;
+  border-color: white;
+  border: 0px;
+}
+
+.scores-table th {
+  border-collapse: collapse;
+  border: 2px solid white;
+}
+.scores-table td {
+  border-collapse: collapse;
+  border: 2px solid white;
+}
+
+@media screen and (max-width: 1100px) {
   .main-page-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
