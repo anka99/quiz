@@ -6,7 +6,7 @@
     "lib": ["es5", "DOM", "ES2015"],
     "outDir": "src/public",
     "listFiles": false,
-    "watch": true
+    "watch": false
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "src/public/**/*"]

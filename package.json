@@ -4,7 +4,7 @@
   "description": "1st assignment for the Web Applications course at the University of Warsaw (2nd year BSc in Computer Science).",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "compile": "tsc"
   },
   "repository": {
     "type": "git",

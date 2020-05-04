@@ -1,12 +1,20 @@
 import Question from "./Question.js";
 import { QuizTemplate } from "../templates/QuizTemplate.js";
-import EntryWindow from "./EntryWindow.js";
+import EntryWindow from "../windows/EntryWindow.js";
 import State from "./State.js";
 import Button from "./Button.js";
 import AnswerContainer from "./AnswerContainer.js";
-import GiveUpWindow from "./GiveUpWindow.js";
-import FinishedWindow from "./FinishedWindow.js";
+import GiveUpWindow from "../windows/GiveUpWindow.js";
+import FinishedWindow from "../windows/FinishedWindow.js";
 import Timer from "./Timer.js";
+import {
+  ENTRY_WINDOW,
+  QUIZ_GIVENUP,
+  QUIZ_FINISHED,
+  QUIZ_ACTIVE,
+  SCORES_WINDOW,
+} from "../tools/types.js";
+import ScoresWindow from "../windows/ScoresWindow.js";
 
 class Quiz {
   private questions: Array<Question>;
@@ -30,7 +38,7 @@ class Quiz {
   constructor(template: QuizTemplate) {
     this.introduction = template.introduction;
     this.questions = new Array(template.questions.length);
-    this.state = new State(0, true, false, false, false, false);
+    this.state = new State(0, ENTRY_WINDOW);
     this.entryWindow = new EntryWindow();
     this.timer = new Timer("timer-place");
     this.giveUpWindow = new GiveUpWindow();
@@ -46,65 +54,44 @@ class Quiz {
       "start",
       "start",
       "start",
-      this.rerender(false, 0, false, false, false, false, this.startTimers)
+      this.rerender(0, QUIZ_ACTIVE, this.startTimers)
     );
 
     this.backButton = new Button(
       "back",
       "back",
       "back",
-      this.rerender(
-        false,
-        -1,
-        false,
-        false,
-        false,
-        false,
-        this.changeQuestionsTimers(-1)
-      )
+      this.rerender(-1, QUIZ_ACTIVE, this.changeQuestionsTimers(-1))
     );
 
     this.nextButton = new Button(
       "next",
       "next",
       "next",
-      this.rerender(
-        false,
-        1,
-        false,
-        false,
-        false,
-        false,
-        this.changeQuestionsTimers(1)
-      )
+      this.rerender(1, QUIZ_ACTIVE, this.changeQuestionsTimers(1))
     );
 
     this.giveUpButton = new Button(
       "giveup",
       "giveup",
       "give up",
-      this.rerender(false, 0, true, false, false, false, this.stopTimers)
+      this.rerender(0, QUIZ_GIVENUP, this.stopTimers)
     );
 
     this.finishQuizButton = new Button(
       "finish",
       "finish",
       "finish",
-      this.rerender(false, 0, false, true, false, false, this.stopTimers)
+      this.rerender(0, QUIZ_FINISHED, this.stopTimers)
     );
 
-    this.restartButton = new Button(
-      "start",
-      "restart",
-      "back to start",
-      this.restart
-    );
+    this.restartButton = new Button("start", "restart", "quit", this.restart);
 
     this.scoresButton = new Button(
       "scoresbtn",
       "scoresbtn",
       "scores",
-      this.rerender(false, 0, false, false, true, false, () => {})
+      this.rerender(0, SCORES_WINDOW, () => {})
     );
   }
 
@@ -128,21 +115,13 @@ class Quiz {
   };
 
   private rerender = (
-    entryWindow: boolean,
     increaseQuestion: number,
-    givenUp: boolean,
-    quizFinished: boolean,
-    scoresWindow: boolean,
-    questionScore: boolean,
+    renderMode: string,
     timeOperation: () => void
   ) => () => {
     this.state = new State(
       this.state.currentQuestion + increaseQuestion,
-      entryWindow,
-      quizFinished,
-      givenUp,
-      scoresWindow,
-      questionScore
+      renderMode
     );
     timeOperation();
     this.render();
@@ -151,7 +130,7 @@ class Quiz {
   private restart = () => {
     this.answers.clear();
     this.state.currentQuestion = 0;
-    this.rerender(true, 0, false, false, false, false, this.timer.reset)();
+    this.rerender(0, ENTRY_WINDOW, this.timer.reset)();
   };
 
   private countTime(): number {
@@ -179,48 +158,52 @@ class Quiz {
     rendered.setAttribute("id", "main-page-grid");
     rendered.appendChild(this.renderHeader());
 
-    if (this.state.entryWindow) {
-      rendered.appendChild(this.entryWindow.render());
-      rendered.appendChild(this.startButton.render());
-      rendered.appendChild(this.scoresButton.render());
-    } else if (this.state.givenUp) {
-      rendered.appendChild(this.giveUpWindow.render());
-      rendered.appendChild(this.restartButton.render());
-      rendered.appendChild(this.scoresButton.render());
-    } else if (this.state.quizFinished) {
-      let time = this.countTime();
-      let finishedWindow = new FinishedWindow(
-        this.questions,
-        this.answers,
-        time,
-        this.restart
-      );
-      rendered.appendChild(finishedWindow.render());
-      rendered.appendChild(finishedWindow.renderSaveRawButton());
-      rendered.appendChild(finishedWindow.renderSaveStatsButton());
-      // rendered.appendChild(this.restartButton.render());
-      // rendered.appendChild(this.scoresButton.render());
-    }
-    // else if (this.state.scoresWindow) {
-    //   rendered.appendChild(Scores.render());
-    //   rendered.appendChild(this.restartButton.render());
-    // }
-    else {
-      rendered.appendChild(
-        this.answers.renderPreviousAnswer(this.state.currentQuestion)
-      );
-      rendered.appendChild(this.timer.render());
-      // rendered.appendChild(
-      //   this.questions[this.state.currentQuestion].timer.render()
-      // ); //DEBUG
-      rendered.appendChild(this.renderCurrentQuestion());
-      if (this.state.currentQuestion > 0) {
-        rendered.appendChild(this.backButton.render());
+    switch (this.state.renderMode) {
+      case ENTRY_WINDOW: {
+        rendered.appendChild(this.entryWindow.render());
+        rendered.appendChild(this.startButton.render());
+        rendered.appendChild(this.scoresButton.render());
+        break;
       }
-      rendered.appendChild(this.giveUpButton.render());
-      rendered.appendChild(this.finishQuizButton.render());
-      if (this.state.currentQuestion < this.questions.length - 1) {
-        rendered.appendChild(this.nextButton.render());
+      case QUIZ_GIVENUP: {
+        rendered.appendChild(this.giveUpWindow.render());
+        rendered.appendChild(this.restartButton.render());
+        rendered.appendChild(this.scoresButton.render());
+        break;
+      }
+      case QUIZ_FINISHED: {
+        let time = this.countTime();
+        let finishedWindow = new FinishedWindow(
+          this.questions,
+          this.answers,
+          time,
+          this.restart
+        );
+        rendered.appendChild(finishedWindow.render());
+        rendered.appendChild(finishedWindow.renderSaveRawButton());
+        rendered.appendChild(finishedWindow.renderSaveStatsButton());
+        break;
+      }
+      case SCORES_WINDOW: {
+        rendered.appendChild(ScoresWindow.render());
+        rendered.appendChild(this.restartButton.render());
+        break;
+      }
+      case QUIZ_ACTIVE: {
+        rendered.appendChild(
+          this.answers.renderPreviousAnswer(this.state.currentQuestion)
+        );
+        rendered.appendChild(this.timer.render());
+        rendered.appendChild(this.renderCurrentQuestion());
+        if (this.state.currentQuestion > 0) {
+          rendered.appendChild(this.backButton.render());
+        }
+        rendered.appendChild(this.giveUpButton.render());
+        rendered.appendChild(this.finishQuizButton.render());
+        if (this.state.currentQuestion < this.questions.length - 1) {
+          rendered.appendChild(this.nextButton.render());
+        }
+        break;
       }
     }
     document
@@ -230,7 +213,7 @@ class Quiz {
       .querySelector("body")
       .insertBefore(rendered, document.getElementById("script"));
 
-    if (!this.state.givenUp && !this.state.entryWindow) {
+    if (this.state.renderMode == QUIZ_ACTIVE) {
       this.answers.render();
     }
   }

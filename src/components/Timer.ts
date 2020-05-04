@@ -40,7 +40,6 @@ class Timer {
       window.clearInterval(this.interval);
       this.interval = null;
     }
-    console.log(this.time);
   };
 
   reset = () => {

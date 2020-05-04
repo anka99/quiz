@@ -1,25 +1,10 @@
 class State {
   currentQuestion: number;
-  entryWindow: boolean;
-  quizFinished: boolean;
-  givenUp: boolean;
-  scoresWindow: boolean;
-  questionScore: boolean;
+  renderMode: string;
 
-  constructor(
-    currentQuestion: number,
-    entryWindow: boolean,
-    quizFinished: boolean,
-    givenUp: boolean,
-    scoreWindow: boolean,
-    questionScore: boolean
-  ) {
+  constructor(currentQuestion: number, renderMode: string) {
     this.currentQuestion = currentQuestion;
-    this.entryWindow = entryWindow;
-    this.quizFinished = quizFinished;
-    this.givenUp = givenUp;
-    this.scoresWindow = scoreWindow;
-    this.questionScore = questionScore;
+    this.renderMode = renderMode;
   }
 }
 

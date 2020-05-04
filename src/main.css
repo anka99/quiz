@@ -45,6 +45,7 @@ button {
   justify-self: stretch;
   border-radius: 10px;
   border-style: none;
+  max-height: 103.6px;
 }
 
 div {
@@ -64,8 +65,7 @@ div {
 }
 
 .rules {
-  grid-column: 1 / 4;
-  grid-row: 2 / 6;
+  grid-area: q;
   align-self: stretch;
   justify-self: stretch;
   background-color: #7ebdc3;
@@ -74,7 +74,7 @@ div {
 }
 
 .start {
-  grid-area: n;
+  grid-area: g;
   background-color: #ff4000;
 }
 
@@ -161,8 +161,7 @@ div {
 }
 .loooser {
   display: grid;
-  grid-column: 1 / 4;
-  grid-row: 2 / 6;
+  grid-area: q;
   text-transform: uppercase;
   font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
     "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
@@ -213,7 +212,7 @@ div {
 }
 
 .scoresbtn {
-  grid-area: s;
+  grid-area: f;
   background-color: #faaa8d;
 }
 
@@ -264,6 +263,24 @@ div {
 .scores-table td {
   border-collapse: collapse;
   border: 2px solid white;
+}
+.prev-scores {
+  display: grid;
+  grid-area: q;
+  text-transform: uppercase;
+  font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
+    "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+  font-size: 30px;
+  color: white;
+  align-self: stretch;
+  justify-self: stretch;
+  background-color: #7ebdc3;
+  border-radius: 10px;
+  border-style: none;
+
+  align-content: center;
+  justify-content: center;
+  padding: 2%;
 }
 
 @media screen and (max-width: 1100px) {
