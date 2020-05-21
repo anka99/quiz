@@ -14,6 +14,7 @@ class Scores {
     } else {
       item = item + quizSpliterator + numberToTime(time);
     }
+    // console.log(item);
     localStorage.setItem(key, item);
   }
 
@@ -53,6 +54,7 @@ class Scores {
     } else {
       item = item + quizSpliterator + newScore;
     }
+    // console.log(item);
     localStorage.setItem(key, item);
   }
 

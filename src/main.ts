@@ -5,4 +5,6 @@ let quiz = new Quiz(template);
 
 // localStorage.removeItem("scores");
 
+// console.log(template);
+
 quiz.render();
