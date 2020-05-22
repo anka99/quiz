@@ -5,17 +5,37 @@ import AnswerContainer from "./AnswerContainer.js";
 const key = "scores";
 const quizSpliterator = "#";
 export const timeSpliterator = "|";
+const token = "token";
 
 class Scores {
+  public static putToken() {
+    localStorage.setItem(token, token);
+  }
+
+  public static tryAcquireToken(): string {
+    if (!localStorage.getItem(token)) {
+      return null;
+    }
+    return token;
+  }
+  private static acquireToken(): void {
+    let t = localStorage.getItem(token);
+    while (!t) {
+      t = localStorage.getItem(token);
+    }
+  }
+
   static addQuizScoreRaw(time: number) {
+    this.acquireToken();
     let item = localStorage.getItem(key);
     if (item === null) {
       item = numberToTime(time);
     } else {
       item = item + quizSpliterator + numberToTime(time);
     }
-    // console.log(item);
+    console.log(item);
     localStorage.setItem(key, item);
+    this.putToken();
   }
 
   private static questionScoreString = (
@@ -40,6 +60,7 @@ class Scores {
     answers: AnswerContainer,
     time: number
   ) {
+    this.acquireToken();
     let item = localStorage.getItem(key);
     let newScore = numberToTime(time) + "|";
     questions.forEach((q) => {
@@ -54,8 +75,9 @@ class Scores {
     } else {
       item = item + quizSpliterator + newScore;
     }
-    // console.log(item);
+    console.log(item);
     localStorage.setItem(key, item);
+    this.putToken();
   }
 
   static getScores(): string[] {

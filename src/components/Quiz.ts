@@ -15,6 +15,7 @@ import {
   SCORES_WINDOW,
 } from "../tools/types.js";
 import ScoresWindow from "../windows/ScoresWindow.js";
+import Scores from "./Scores.js";
 
 class Quiz {
   private questions: Array<Question>;
@@ -141,6 +142,14 @@ class Quiz {
       i++;
     });
     return time;
+  }
+
+  public putToken() {
+    Scores.putToken();
+  }
+
+  public tryFetchToken(): string {
+    return Scores.tryAcquireToken();
   }
 
   renderHeader() {
