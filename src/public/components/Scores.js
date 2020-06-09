@@ -1,6 +1,6 @@
 import { numberToTime } from "../tools/timeTools.js";
 const version = 1;
-const name = "Scores";
+const name = "MyQuizScores";
 const storeName = "ScoresStore";
 let Scores = (() => {
     class Scores {
