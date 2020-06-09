@@ -88,9 +88,11 @@ class FinishedWindow {
     headRow.appendChild(tr);
     return headRow;
   };
+
   renderSaveRawButton = (): HTMLElement => {
     return this.saveRawButton.render();
   };
+
   renderSaveStatsButton = (): HTMLElement => {
     return this.saveStatsButton.render();
   };

@@ -15,6 +15,7 @@ import {
   SCORES_WINDOW,
 } from "../tools/types.js";
 import ScoresWindow from "../windows/ScoresWindow.js";
+import Scores from "./Scores.js";
 
 class Quiz {
   private questions: Array<Question>;
@@ -185,7 +186,10 @@ class Quiz {
         break;
       }
       case SCORES_WINDOW: {
-        rendered.appendChild(ScoresWindow.render());
+        const appendWindow = (window: HTMLElement) => {
+          rendered.appendChild(window);
+        };
+        Scores.extractScores(ScoresWindow.render, appendWindow);
         rendered.appendChild(this.restartButton.render());
         break;
       }
