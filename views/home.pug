@@ -1,0 +1,32 @@
+html
+
+    head
+
+        title= title
+
+        style
+
+            include style.css
+
+    body
+
+        div
+
+            h1="Hello " + username + "! A bunch of new quizzes for you: "
+
+        div
+
+            ul
+                each  quiz in quizzes
+
+                    li
+
+                    a(href="quiz/" + quiz.id) #{quiz.introduction}
+
+        div
+
+            form(method='POST', action="/")
+                button(type="submit") Log out
+
+
+        

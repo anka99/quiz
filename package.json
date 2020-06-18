@@ -4,7 +4,14 @@
   "description": "1st assignment for the Web Applications course at the University of Warsaw (2nd year BSc in Computer Science).",
   "main": "index.js",
   "scripts": {
-    "compile": "tsc"
+    "compile": "npm run compiletemplates && npm run compileserver && npm run compilefrontend && npm run lint",
+    "compilefrontend": "tsc -p ./tsconfig.templates.json",
+    "compileserver": "tsc -p ./tsconfig.server.json",
+    "compiletemplates": "tsc -p ./tsconfig.templates.json",
+    "runserver": "node public/server/server.js",
+    "lint": "tslint -p tsconfig.server.json",
+    "createdb": "node public/server/database/createdb.js",
+    "test": "mocha --require ts-node/register server/tests/*"
   },
   "repository": {
     "type": "git",
@@ -18,6 +25,23 @@
   },
   "homepage": "https://github.com/anka99/quiz#readme",
   "dependencies": {
-    "bulma": "^0.8.2"
+    "@types/express": "^4.17.6",
+    "bulma": "^0.8.2",
+    "connect-sqlite": "0.0.1",
+    "connect-sqlite3": "^0.9.11",
+    "cookie-parser": "^1.4.5",
+    "csurf": "^1.11.0",
+    "express": "^4.17.1",
+    "express-session": "^1.17.1",
+    "npm": "^6.14.5",
+    "path": "^0.12.7",
+    "pug": "^3.0.0",
+    "sha256": "^0.2.0",
+    "sqlite3": "^4.2.0"
+  },
+  "devDependencies": {
+    "@types/csurf": "^1.9.36",
+    "@types/express-session": "^1.17.0",
+    "@types/node": "^14.0.13"
   }
 }
