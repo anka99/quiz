@@ -21,12 +21,11 @@ html
 
                     li
 
-                    a(href="quiz/" + quiz.id) #{quiz.introduction}
+                        form(method='POST', action="/quiz/" + quiz.id)
+                            button(type="submit") #{quiz.introduction}
+                            input(type="hidden" name="quizId" value=quiz.id) 
 
         div
 
-            form(method='POST', action="/")
-                button(type="submit") Log out
-
-
-        
+            form(method='POST', action="/logout")
+                button(type="submit") Log out 

@@ -1,6 +1,6 @@
 import { QuizTemplate } from "../templates/QuizTemplate";
 import * as sqlite from "sqlite3";
-import { openDatabase } from "./utils";
+import { openDatabase, standardCatch } from "./utils";
 import { QuestionTemplate } from "../templates/QuestionTemplate";
 import IdQuiz from "./IdQuiz";
 
@@ -11,7 +11,6 @@ const getId = (db): Promise<number> => {
         reject(err);
         return;
       }
-      console.log(row.quizId);
       resolve(row.quizId);
     });
   });
@@ -68,7 +67,6 @@ const addQuestions = (
 ): Promise<void> => {
   return new Promise(async (resolve, reject) => {
     if (questionsLeft > 0) {
-      console.log("adding question " + questionsLeft);
       const question = questions[questionsLeft - 1];
       addQuestion(
         db,
@@ -87,7 +85,6 @@ const addQuestions = (
           return;
         });
     } else {
-      console.log("resolving");
       resolve();
     }
   });
@@ -117,11 +114,28 @@ export const addQuiz = (quiz: QuizTemplate) => {
     });
 };
 
-const qetQuestions = (quizId: number): Promise<QuestionTemplate[]> =>  {
+const getQuestions = (quizId: number): Promise<QuestionTemplate[]> => {
+  return new Promise((resolve, reject) => {
+    const db = openDatabase();
+    db.all(`SELECT * FROM questions WHERE quiz = ${quizId};`, (err, rows) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      const questions = new Array<QuestionTemplate>();
+      rows.forEach((row) => {
+        questions.push({
+          question: row.task,
+          answer: row.answer,
+          penalty: row.penalty,
+        });
+      });
+      resolve(questions);
+    }).close();
+  });
+};
 
-}
-
-export const getQuizzes = (): Promise<QuizTemplate[]> => {
+export const getDescr = (): Promise<IdQuiz[]> => {
   return new Promise((resolve, reject) => {
     const db = openDatabase();
     db.all(`SELECT * FROM quiz;`, (err, rows) => {
@@ -129,10 +143,31 @@ export const getQuizzes = (): Promise<QuizTemplate[]> => {
         reject(err);
         return;
       }
-      const quizzes = new Array<QuizTemplate>();
-      rows.forEach(row => {
-        const quiz = new IdQuiz(row.)
+      const quizzes = new Array<IdQuiz>();
+      rows.forEach((row) => {
+        const quiz = new IdQuiz(row.id, row.description);
+        quizzes.push(quiz);
       });
-    });
+      resolve(quizzes);
+    }).close();
+  });
+};
+
+export const getQuizzes = (): Promise<IdQuiz[]> => {
+  return new Promise((resolve, reject) => {
+    getDescr()
+      .then((quizzes) => {
+        quizzes.forEach(async (q) => {
+          try {
+            q.questions = await getQuestions(q.id);
+          } catch (err) {
+            console.log(err.message);
+            reject(err);
+            return;
+          }
+        });
+        resolve(quizzes);
+      })
+      .catch(standardCatch);
   });
 };

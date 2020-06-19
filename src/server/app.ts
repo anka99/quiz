@@ -6,8 +6,9 @@ import { verifyUser } from "./auth";
 import * as sqlite from "sqlite3";
 import csurf from "csurf";
 import path from "path";
-import { addQuiz } from "./quiz";
+import { addQuiz, getQuizzes, getDescr } from "./quiz";
 import { template } from "./templates/ExampleTemplate";
+import { standardCatch } from "./utils";
 
 // tslint:disable-next-line: no-var-requires
 const connectSqlite = require("connect-sqlite3");
@@ -18,7 +19,7 @@ const app = express();
 
 const csrfProtection = csurf({ cookie: true });
 
-const secretValue = "Duchowe zycie zwierzat.";
+const secretValue = "IN GIRUM IMUS NOCTE ET CONSUMIMUR IGNI";
 
 app.set("view engine", "pug");
 
@@ -54,7 +55,7 @@ app.use(
   })
 );
 
-addQuiz(template);
+// addQuiz(template);
 
 app.get("/", (req, res) => {
   if (req.session?.user === null) {
@@ -69,6 +70,27 @@ app.get("/", (req, res) => {
 app.get("/home", (req, res) => {
   if (req.session?.user === null) {
     res.redirect("/login");
+  } else {
+    let quizzes;
+    getDescr()
+      .then((q) => {
+        quizzes = q;
+        res.render("home", {
+          quizzes: quizzes,
+          username: req.session?.user,
+        });
+      })
+      .catch(standardCatch);
+  }
+});
+
+app.post("/logout", (req, res) => {
+  if (req.session?.user === null) {
+    res.redirect("/login");
+  } else {
+    console.log("logout clicked");
+    req.session.user = null;
+    res.redirect("/login");
   }
 });
 
@@ -79,17 +101,47 @@ app.get("/login", csrfProtection, (req, res, next) => {
 app.post("/login", csrfProtection, (req, res) => {
   const username: string = req.body.username;
   const password: string = req.body.password;
-  verifyUser(username, password)
-    .then((correct: boolean) => {
-      if (correct) {
-        req.session.user = username;
-        res.redirect("/");
+  if (username && password) {
+    verifyUser(username, password)
+      .then((correct: boolean) => {
+        if (correct) {
+          req.session.user = username;
+          res.redirect("/home");
+        } else {
+          console.log("Incorrect credentials");
+        }
+      })
+      .catch((message) => {
+        console.log(message);
+      });
+  }
+});
+
+app.post("/meme/:memeId", csrfProtection, async function (req, res, next) {
+  allMemes
+    .getMemeLoop(req.params.memeId)
+    .then((meme) => {
+      if (!meme) {
+        next(createError(404));
+      }
+      if (req.session.user != null) {
+        const price = req.body.price;
+        if (+price != null && !isNaN(+price) && +price > 0) {
+          allMemes
+            .changeMemePrice(req.params.memeId, +price, req.session.user)
+            .then(() => {
+              meme.changePrice(+price, req.session.user);
+              res.render("meme", { meme: meme, csrfToken: req.csrfToken() });
+            });
+        } else {
+          res.render("meme", { meme: meme, csrfToken: req.csrfToken() });
+        }
       } else {
-        console.log("Inorrect credentials");
+        res.redirect("/login/");
       }
     })
-    .catch((message) => {
-      console.log(message);
+    .catch((err) => {
+      console.log("get meme error");
     });
 });
 

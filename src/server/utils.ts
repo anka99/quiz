@@ -64,3 +64,7 @@ export const rollbackFun = (db: sqlite.Database) => () => {
     console.log(message);
   });
 };
+
+export const standardCatch = (err) => {
+  console.log(err.message);
+};

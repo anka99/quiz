@@ -14,6 +14,14 @@ class IdQuiz {
   public get id(): number {
     return this.#id;
   }
+
+  public get introduction(): string {
+    return this.#introduction;
+  }
+
+  public set questions(v: QuestionTemplate[]) {
+    this.#questions = v;
+  }
 }
 
 export default IdQuiz;
