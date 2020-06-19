@@ -6,9 +6,10 @@ import { verifyUser } from "./auth";
 import * as sqlite from "sqlite3";
 import csurf from "csurf";
 import path from "path";
-import { addQuiz, getQuizzes, getDescr } from "./quiz";
+import { addQuiz, getQuizzes, getDescr, getQuestionsSafe } from "./quiz";
 import { template } from "./templates/ExampleTemplate";
 import { standardCatch } from "./utils";
+import { QuizTemplate } from "../templates/QuizTemplate";
 
 // tslint:disable-next-line: no-var-requires
 const connectSqlite = require("connect-sqlite3");
@@ -58,7 +59,7 @@ app.use(
 // addQuiz(template);
 
 app.get("/", (req, res) => {
-  if (req.session?.user === null) {
+  if (!req.session || !req.session.user) {
     res.redirect("/login");
   } else {
     res.sendFile("public/quiz.html", {
@@ -68,7 +69,7 @@ app.get("/", (req, res) => {
 });
 
 app.get("/home", (req, res) => {
-  if (req.session?.user === null) {
+  if (!req.session || !req.session.user) {
     res.redirect("/login");
   } else {
     let quizzes;
@@ -85,20 +86,19 @@ app.get("/home", (req, res) => {
 });
 
 app.post("/logout", (req, res) => {
-  if (req.session?.user === null) {
+  if (!req.session || !req.session.user) {
     res.redirect("/login");
   } else {
-    console.log("logout clicked");
     req.session.user = null;
     res.redirect("/login");
   }
 });
 
-app.get("/login", csrfProtection, (req, res, next) => {
-  res.render("login", { csrfToken: req.csrfToken() });
+app.get("/login", (req, res, next) => {
+  res.render("login");
 });
 
-app.post("/login", csrfProtection, (req, res) => {
+app.post("/login", (req, res) => {
   const username: string = req.body.username;
   const password: string = req.body.password;
   if (username && password) {
@@ -117,32 +117,29 @@ app.post("/login", csrfProtection, (req, res) => {
   }
 });
 
-app.post("/meme/:memeId", csrfProtection, async function (req, res, next) {
-  allMemes
-    .getMemeLoop(req.params.memeId)
-    .then((meme) => {
-      if (!meme) {
-        next(createError(404));
-      }
-      if (req.session.user != null) {
-        const price = req.body.price;
-        if (+price != null && !isNaN(+price) && +price > 0) {
-          allMemes
-            .changeMemePrice(req.params.memeId, +price, req.session.user)
-            .then(() => {
-              meme.changePrice(+price, req.session.user);
-              res.render("meme", { meme: meme, csrfToken: req.csrfToken() });
-            });
-        } else {
-          res.render("meme", { meme: meme, csrfToken: req.csrfToken() });
-        }
-      } else {
-        res.redirect("/login/");
-      }
+app.post("/quiz/:quizId", function (req, res, next) {
+  if (!req.session || !req.session.user) {
+    res.redirect("/login");
+  } else {
+    req.session.quiz = req.body.quizId;
+    console.log(req.session.quiz);
+    res.redirect("/");
+  }
+});
+
+app.get("/quiz", async function (req, res, next) {
+  if (!req.session || !req.session.user) {
+    res.redirect("/login");
+  } else {
+    getQuestionsSafe(req.session.quiz).then((questions) => {
+      
     })
-    .catch((err) => {
-      console.log("get meme error");
-    });
+    const quiz : QuizTemplate = {
+      id = req.session.quiz,
+      introduction = 
+    }
+    res.json(quiz);
+  }
 });
 
 // // catch 404 and forward to error handler

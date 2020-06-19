@@ -135,6 +135,23 @@ const getQuestions = (quizId: number): Promise<QuestionTemplate[]> => {
   });
 };
 
+export const getQuestionsSafe = (
+  quizId: number
+): Promise<QuestionTemplate[]> => {
+  return new Promise((resolve, reject) => {
+    getQuestions(quizId)
+      .then((questions) => {
+        questions.forEach((q) => {
+          q.answer = "?";
+        });
+        resolve(questions);
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+
 export const getDescr = (): Promise<IdQuiz[]> => {
   return new Promise((resolve, reject) => {
     const db = openDatabase();
@@ -153,21 +170,9 @@ export const getDescr = (): Promise<IdQuiz[]> => {
   });
 };
 
-export const getQuizzes = (): Promise<IdQuiz[]> => {
+export const getQuizDescr = (quizId: number): Promise<string> => {
   return new Promise((resolve, reject) => {
-    getDescr()
-      .then((quizzes) => {
-        quizzes.forEach(async (q) => {
-          try {
-            q.questions = await getQuestions(q.id);
-          } catch (err) {
-            console.log(err.message);
-            reject(err);
-            return;
-          }
-        });
-        resolve(quizzes);
-      })
-      .catch(standardCatch);
+    const db = openDatabase();
+    db.get(`SELECT `);
   });
 };
