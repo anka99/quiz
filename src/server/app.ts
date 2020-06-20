@@ -10,6 +10,7 @@ import { standardCatch } from "./utils";
 import { QuizTemplate } from "../templates/QuizTemplate";
 import bodyParser from "body-parser";
 import template from "../templates/ExampleTemplate";
+import { addScore } from "./score";
 
 // tslint:disable-next-line: no-var-requires
 const connectSqlite = require("connect-sqlite3");
@@ -56,7 +57,8 @@ app.use(
   })
 );
 
-// addQuiz(template);
+addQuiz(template);
+addQuiz(template);
 
 app.get("/", (req, res) => {
   if (!req.session || !req.session.user) {
@@ -142,15 +144,18 @@ app.get("/quiz", async (req, res, next) => {
               introduction: description,
               questions: questions,
             };
-            res.json(quiz);
+            req.session.timeStart = Date.now();
+            res.status(200).json(quiz);
           })
           .catch((message) => {
             console.log(message);
+            res.status(501);
             // create error
           });
       })
       .catch((err) => {
         console.log(err.message);
+        res.status(502);
         // create error
       });
   }
@@ -160,6 +165,16 @@ app.use(bodyParser.json());
 
 app.post("/answers", (req, res) => {
   console.log(req.body);
+  const time = (Date.now() - req.session.timeStart) / 1000;
+  addScore(req.body, req.session.user, req.body.id, time)
+    .then(() => {
+      console.log("score added");
+      req.session.timeStart = null;
+      req.session.quiz = null;
+    })
+    .catch((err) => {
+      console.log(err.message);
+    });
 });
 
 // app.post("/submit", (req, res, next) => {});

@@ -16,7 +16,6 @@ import {
 } from "../tools/types.js";
 import ScoresWindow from "../windows/ScoresWindow.js";
 import Scores from "./Scores.js";
-import { time } from "console";
 
 class Quiz {
   private id: number;
@@ -141,8 +140,7 @@ class Quiz {
   };
 
   private countTime(): number {
-    const time = this.timer.seconds;
-    return time;
+    return this.timer.seconds;
   }
 
   renderHeader() {

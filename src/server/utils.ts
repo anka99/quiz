@@ -35,7 +35,8 @@ export const commit = (db: sqlite.Database): Promise<void> => {
       }
       console.log("commit");
       resolve();
-    }).close();
+    });
+    // .close();
   });
 };
 
@@ -47,13 +48,13 @@ export const commitFun = (db: sqlite.Database) => () => {
 };
 
 export const rollback = (db: sqlite.Database): Promise<void> => {
+  console.log("rollback");
   return new Promise((resolve, reject) => {
     db.run(`ROLLBACK;`, (err) => {
       if (err) {
         reject(err.message);
         return;
       }
-      console.log("rollback");
       resolve();
     }).close();
   });

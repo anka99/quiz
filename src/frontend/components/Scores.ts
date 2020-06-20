@@ -120,7 +120,7 @@ class Scores {
   ): number[] => {
     const times = new Array();
     questions.forEach((q) => {
-      times.push((time * 100) / q.getTime());
+      times.push((q.getTime() * 100) / time);
     });
     return times;
   };

@@ -114,25 +114,28 @@ export const addQuiz = (quiz: QuizTemplate) => {
     });
 };
 
-const getQuestions = (quizId: number): Promise<QuestionTemplate[]> => {
+export const getQuestions = (quizId: number): Promise<QuestionTemplate[]> => {
   return new Promise((resolve, reject) => {
     const db = openDatabase();
-    db.all(`SELECT * FROM questions WHERE quiz = ${quizId};`, (err, rows) => {
-      if (err) {
-        reject(err);
-        return;
-      }
-      const questions = new Array<QuestionTemplate>();
-      rows.forEach((row) => {
-        questions.push({
-          id: row.id,
-          question: row.task,
-          answer: row.answer,
-          penalty: row.penalty,
+    db.all(
+      `SELECT * FROM questions WHERE quiz = ${quizId} ORDER BY id;`,
+      (err, rows) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+        const questions = new Array<QuestionTemplate>();
+        rows.forEach((row) => {
+          questions.push({
+            id: row.id,
+            question: row.task,
+            answer: row.answer,
+            penalty: row.penalty,
+          });
         });
-      });
-      resolve(questions);
-    }).close();
+        resolve(questions);
+      }
+    ).close();
   });
 };
 
