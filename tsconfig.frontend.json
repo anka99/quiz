@@ -4,10 +4,9 @@
     "removeComments": true,
     "sourceMap": true,
     "lib": ["es5", "DOM", "ES2015"],
-    "outDir": "public/server",
+    "outDir": "public/",
     "listFiles": false,
     "watch": false
   },
-  "include": ["src/frontend/**/*"],
-  "exclude": ["src/frontend/public"]
+  "include": ["src/frontend/**/*"]
 }

@@ -37,30 +37,30 @@ class FinishedWindow {
   }
 
   saveRaw = (): void => {
-    Scores.addQuizScoreRaw(this.time);
+    // Scores.addQuizScoreRaw(this.time);
     this.onSave();
   };
 
   saveStats = (): void => {
-    Scores.addQuizScoreDetailed(this.questions, this.answers, this.time);
+    // Scores.addQuizScoreDetailed(this.questions, this.answers, this.time);
     this.onSave();
   };
 
   private renderRow = (question: Question): HTMLElement => {
-    let row = document.createElement("tr");
+    const row = document.createElement("tr");
     row.setAttribute("class", "scores-row");
-    let questionNumber = document.createElement("td");
+    const questionNumber = document.createElement("td");
     questionNumber.innerText = (question.questionId + 1).toString();
-    let questionText = document.createElement("td");
+    const questionText = document.createElement("td");
     questionText.innerText = question.getContet();
-    let penalty = document.createElement("td");
+    const penalty = document.createElement("td");
     if (question.checkAnswer(this.answers.getAnswer(question.questionId)) > 0) {
       penalty.innerText = "+ " + question.getPenalty().toString() + " seconds";
       row.setAttribute("class", "incorrect");
     } else {
       penalty.innerText = "+ 0 seconds";
     }
-    let timeSpent = document.createElement("td");
+    const timeSpent = document.createElement("td");
     timeSpent.innerText = numberToTime(question.getTime());
     row.appendChild(questionNumber);
     row.appendChild(questionText);
@@ -70,16 +70,16 @@ class FinishedWindow {
   };
 
   private renderTHead = (): HTMLElement => {
-    let headRow = document.createElement("thead");
+    const headRow = document.createElement("thead");
     headRow.setAttribute("class", "scores-head");
-    let tr = document.createElement("tr");
-    let questionNumber = document.createElement("th");
+    const tr = document.createElement("tr");
+    const questionNumber = document.createElement("th");
     questionNumber.innerText = "number";
-    let questionText = document.createElement("td");
+    const questionText = document.createElement("td");
     questionText.innerText = "question";
-    let penalty = document.createElement("td");
+    const penalty = document.createElement("td");
     penalty.innerText = "your penalty";
-    let timeSpent = document.createElement("td");
+    const timeSpent = document.createElement("td");
     timeSpent.innerText = "time spent";
     tr.appendChild(questionNumber);
     tr.appendChild(questionText);
@@ -98,16 +98,17 @@ class FinishedWindow {
   };
 
   render = (): HTMLElement => {
-    let scoresWindow = document.createElement("div");
+    const scoresWindow = document.createElement("div");
     scoresWindow.setAttribute("class", "scores-window");
-    let yourScoreText = document.createElement("h1");
+    const yourScoreText = document.createElement("h1");
     yourScoreText.textContent = "your time: " + numberToTime(this.time);
-    let scoresTable = document.createElement("table");
+    const scoresTable = document.createElement("table");
     scoresTable.setAttribute("class", "scores-table");
-    let tableHead = this.renderTHead();
-    let tableBody = document.createElement("tbody");
+    const tableHead = this.renderTHead();
+    const tableBody = document.createElement("tbody");
 
     this.questions.forEach((question) => {
+      question.stopTimer();
       tableBody.appendChild(this.renderRow(question));
     });
 

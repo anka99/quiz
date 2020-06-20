@@ -11,7 +11,7 @@ class Timer {
     this.interval = null;
     this.element = document.createElement("div");
     this.element.setAttribute("class", className);
-    let timerText = document.createElement("h2");
+    const timerText = document.createElement("h2");
     timerText.setAttribute("id", "timer");
     timerText.innerText = "00:00:00";
     this.element.appendChild(timerText);
@@ -22,7 +22,7 @@ class Timer {
   }
 
   update = () => {
-    let timerText: HTMLHeadingElement = this.element.querySelector("#timer");
+    const timerText: HTMLHeadingElement = this.element.querySelector("#timer");
     timerText.innerText = numberToTime(this.time);
   };
 
@@ -43,7 +43,7 @@ class Timer {
   };
 
   reset = () => {
-    this.stop;
+    this.stop();
     this.time = 0;
     this.update();
   };

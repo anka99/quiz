@@ -71,7 +71,7 @@ const addQuestions = (
       addQuestion(
         db,
         quizId,
-        questionsLeft,
+        questionsLeft - 1,
         question.question,
         question.answer,
         question.penalty
@@ -125,6 +125,7 @@ const getQuestions = (quizId: number): Promise<QuestionTemplate[]> => {
       const questions = new Array<QuestionTemplate>();
       rows.forEach((row) => {
         questions.push({
+          id: row.id,
           question: row.task,
           answer: row.answer,
           penalty: row.penalty,
@@ -173,6 +174,16 @@ export const getDescr = (): Promise<IdQuiz[]> => {
 export const getQuizDescr = (quizId: number): Promise<string> => {
   return new Promise((resolve, reject) => {
     const db = openDatabase();
-    db.get(`SELECT `);
+    db.get(`SELECT * from quiz WHERE id = ${quizId};`, (err, row) => {
+      if (err) {
+        reject(err.message);
+        return;
+      }
+      if (!row) {
+        reject("Invalid quiz id");
+        return;
+      }
+      resolve(row.description);
+    });
   });
 };

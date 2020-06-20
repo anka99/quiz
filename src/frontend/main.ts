@@ -1,6 +1,18 @@
 import Quiz from "./components/Quiz.js";
-import { template } from "./templates/ExampleTemplate.js";
 
-const quiz = new Quiz(template);
-
-quiz.render();
+fetch("/quiz", {
+  method: "GET",
+  headers: {
+    "Content-Type": "application/json",
+  },
+})
+  .then((rawData) => rawData.json())
+  .then((data) => {
+    console.log("dupa");
+    console.log(data);
+    const quiz = new Quiz(data);
+    quiz.render();
+  })
+  .catch((err) => {
+    console.log(err);
+  });

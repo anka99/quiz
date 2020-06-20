@@ -1,5 +1,5 @@
 import Question from "./Question.js";
-import { QuizTemplate } from "../templates/QuizTemplate.js";
+import { QuizTemplate } from "../../templates/QuizTemplate.js";
 import EntryWindow from "../windows/EntryWindow.js";
 import State from "./State.js";
 import Button from "./Button.js";
@@ -16,13 +16,15 @@ import {
 } from "../tools/types.js";
 import ScoresWindow from "../windows/ScoresWindow.js";
 import Scores from "./Scores.js";
+import { time } from "console";
 
 class Quiz {
-  private questions: Array<Question>;
+  private id: number;
+  private questions: Question[];
   private introduction: string;
   private state: State;
 
-  //Buttons:
+  // Buttons:
   private nextButton: Button;
   private backButton: Button;
   private giveUpButton: Button;
@@ -37,6 +39,7 @@ class Quiz {
   private giveUpWindow: GiveUpWindow;
 
   constructor(template: QuizTemplate) {
+    this.id = template.id;
     this.introduction = template.introduction;
     this.questions = new Array(template.questions.length);
     this.state = new State(0, ENTRY_WINDOW);
@@ -47,7 +50,7 @@ class Quiz {
 
     let i = 0;
     template.questions.forEach((element) => {
-      this.questions[i] = new Question(element, this.answers, i);
+      this.questions[i] = new Question(element, this.answers);
       i++;
     });
 
@@ -79,12 +82,15 @@ class Quiz {
       this.rerender(0, QUIZ_GIVENUP, this.stopTimers)
     );
 
-    this.finishQuizButton = new Button(
-      "finish",
-      "finish",
-      "finish",
-      this.rerender(0, QUIZ_FINISHED, this.stopTimers)
-    );
+    this.finishQuizButton = new Button("finish", "finish", "finish", () => {
+      this.rerender(0, QUIZ_FINISHED, this.stopTimers)();
+      Scores.sendQuizScore(
+        this.id,
+        this.questions,
+        this.answers,
+        this.timer.seconds
+      );
+    });
 
     this.restartButton = new Button("start", "restart", "quit", this.restart);
 
@@ -111,8 +117,8 @@ class Quiz {
   };
 
   private changeQuestionsTimers = (increaseQuestion: number) => () => {
-    this.questions[this.state.currentQuestion].startTimer(); //start current question timer
-    this.questions[this.state.currentQuestion - increaseQuestion].stopTimer(); //freeze previous question timer
+    this.questions[this.state.currentQuestion].startTimer(); // start current question timer
+    this.questions[this.state.currentQuestion - increaseQuestion].stopTimer(); // freeze previous question timer
   };
 
   private rerender = (
@@ -135,18 +141,13 @@ class Quiz {
   };
 
   private countTime(): number {
-    let time = this.timer.seconds;
-    let i = 0;
-    this.questions.forEach((q) => {
-      time += q.checkAnswer(this.answers.getAnswer(i));
-      i++;
-    });
+    const time = this.timer.seconds;
     return time;
   }
 
   renderHeader() {
-    let headerDiv = document.createElement("div");
-    let introduction = document.createElement("h1");
+    const headerDiv = document.createElement("div");
+    const introduction = document.createElement("h1");
     headerDiv.setAttribute("class", "header");
     introduction.innerText = this.introduction;
     headerDiv.appendChild(introduction);
@@ -154,7 +155,7 @@ class Quiz {
   }
 
   render() {
-    let rendered = document.createElement("div");
+    const rendered = document.createElement("div");
     rendered.setAttribute("class", "main-page-grid");
     rendered.setAttribute("id", "main-page-grid");
     rendered.appendChild(this.renderHeader());
@@ -173,8 +174,8 @@ class Quiz {
         break;
       }
       case QUIZ_FINISHED: {
-        let time = this.countTime();
-        let finishedWindow = new FinishedWindow(
+        const time = this.countTime(); // tu muszę mieć czas bez doliczania kar
+        const finishedWindow = new FinishedWindow(
           this.questions,
           this.answers,
           time,
@@ -186,11 +187,11 @@ class Quiz {
         break;
       }
       case SCORES_WINDOW: {
-        const appendWindow = (window: HTMLElement) => {
-          rendered.appendChild(window);
-        };
-        Scores.extractScores(ScoresWindow.render, appendWindow);
-        rendered.appendChild(this.restartButton.render());
+        // const appendWindow = (window: HTMLElement) => {
+        //   rendered.appendChild(window);
+        // };
+        // Scores.extractScores(ScoresWindow.render, appendWindow);
+        // rendered.appendChild(this.restartButton.render());
         break;
       }
       case QUIZ_ACTIVE: {

@@ -3,13 +3,13 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import session from "express-session";
 import { verifyUser } from "./auth";
-import * as sqlite from "sqlite3";
 import csurf from "csurf";
 import path from "path";
-import { addQuiz, getQuizzes, getDescr, getQuestionsSafe } from "./quiz";
-import { template } from "./templates/ExampleTemplate";
+import { addQuiz, getDescr, getQuestionsSafe, getQuizDescr } from "./quiz";
 import { standardCatch } from "./utils";
 import { QuizTemplate } from "../templates/QuizTemplate";
+import bodyParser from "body-parser";
+import template from "../templates/ExampleTemplate";
 
 // tslint:disable-next-line: no-var-requires
 const connectSqlite = require("connect-sqlite3");
@@ -117,30 +117,52 @@ app.post("/login", (req, res) => {
   }
 });
 
-app.post("/quiz/:quizId", function (req, res, next) {
+app.post("/quiz/:quizId", (req, res) => {
   if (!req.session || !req.session.user) {
     res.redirect("/login");
   } else {
     req.session.quiz = req.body.quizId;
-    console.log(req.session.quiz);
+    // console.log(req.session.quiz);
     res.redirect("/");
   }
 });
 
-app.get("/quiz", async function (req, res, next) {
+app.get("/quiz", async (req, res, next) => {
   if (!req.session || !req.session.user) {
     res.redirect("/login");
   } else {
-    getQuestionsSafe(req.session.quiz).then((questions) => {
-      
-    })
-    const quiz : QuizTemplate = {
-      id = req.session.quiz,
-      introduction = 
-    }
-    res.json(quiz);
+    const quizId = req.session.quiz;
+    console.log(quizId);
+    getQuestionsSafe(quizId)
+      .then((questions) => {
+        getQuizDescr(quizId)
+          .then((description) => {
+            const quiz: QuizTemplate = {
+              id: quizId,
+              introduction: description,
+              questions: questions,
+            };
+            res.json(quiz);
+          })
+          .catch((message) => {
+            console.log(message);
+            // create error
+          });
+      })
+      .catch((err) => {
+        console.log(err.message);
+        // create error
+      });
   }
 });
+
+app.use(bodyParser.json());
+
+app.post("/answers", (req, res) => {
+  console.log(req.body);
+});
+
+// app.post("/submit", (req, res, next) => {});
 
 // // catch 404 and forward to error handler
 // app.use((req, res, next) => {

@@ -6,4 +6,6 @@ const templateJSON: string =
   '{"question":"42 * 2","answer":"84","penalty":40},' +
   '{"question":"(-8)/2","answer":"-4","penalty":50}' +
   "]}";
-export const template = JSON.parse(templateJSON);
+const template = JSON.parse(templateJSON);
+
+export default template;

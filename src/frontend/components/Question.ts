@@ -1,4 +1,4 @@
-import { QuestionTemplate } from "../templates/QuestionTemplate.js";
+import { QuestionTemplate } from "../../templates/QuestionTemplate.js";
 import AnswerContainer from "./AnswerContainer.js";
 import Timer from "./Timer.js";
 
@@ -10,15 +10,11 @@ class Question {
   private answerContainer: AnswerContainer;
   private timer: Timer;
 
-  constructor(
-    template: QuestionTemplate,
-    answerContainer: AnswerContainer,
-    id: number
-  ) {
+  constructor(template: QuestionTemplate, answerContainer: AnswerContainer) {
     this.question = template.question;
     this.correctAswer = template.answer;
     this.penalty = template.penalty;
-    this.id = id;
+    this.id = template.id;
     this.answerContainer = answerContainer;
     this.timer = new Timer("question-timer-place");
   }
