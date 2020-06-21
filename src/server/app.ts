@@ -10,7 +10,7 @@ import { standardCatch } from "./utils";
 import { QuizTemplate } from "../templates/QuizTemplate";
 import bodyParser from "body-parser";
 import template from "../templates/ExampleTemplate";
-import { addScore } from "./score";
+import { addScore, getAnswers, verifyScore } from "./score";
 
 // tslint:disable-next-line: no-var-requires
 const connectSqlite = require("connect-sqlite3");
@@ -177,6 +177,26 @@ app.post("/answers", (req, res) => {
     });
 });
 
+app.post("/history/:quizId", (req, res) => {
+  if (!req.session || !req.session.user) {
+    res.redirect("/login");
+  } else {
+    // console.log(req.session.quiz);
+    res.redirect("/history/" + req.body.quizId);
+  }
+});
+
+app.get("/history/:quizId", (req, res) => {
+  if (!req.session || !req.session.user) {
+    res.redirect("/login");
+  } else {
+    getAnswers(req.body.quizId, req.session.user).then((answers) => {
+      verifyScore(answers, req.body.quizId).then((score) => {
+        console.log(score);
+      })
+    res.redirect("/history/" + req.body.quizId);
+  }
+});
 // app.post("/submit", (req, res, next) => {});
 
 // // catch 404 and forward to error handler

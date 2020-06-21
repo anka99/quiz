@@ -10,7 +10,8 @@ import {
 import * as sqlite from "sqlite3";
 import { QuestionTemplate } from "../templates/QuestionTemplate";
 import { QuizTemplate } from "../templates/QuizTemplate";
-import { getQuestionsSafe, getQuestions } from "./quiz";
+import { getQuestionsSafe, getQuestions, getQuizDescr } from "./quiz";
+import { UserScore } from "../templates/UserScore";
 
 const addAnswer = (
   db: sqlite.Database,
@@ -99,26 +100,75 @@ export const addScore = (
 
 export const verifyScore = (
   answers: UserAnswers,
-  username: string,
   quizId: number
-): Promise<QuizTemplate> => {
+): Promise<UserScore> => {
   return new Promise((resolve, reject) => {
-    let questionsInfo = new Array<QuestionTemplate>();
+    const questionsInfo = new Array<QuestionTemplate>();
     const score = answers.times.reduce((prev, curr, index, arr) => {
       return prev + curr;
     });
-    getQuestions(quizId).then((questions) => {
-      let i = 0;
-      questions.forEach((q) => {
-        let qInfo: QuestionTemplate = {
-          id: i,
-          question: q.question,
-          answer: q.answer,
-          penalty: q.penalty,
+    let quiz: QuizTemplate;
+    getQuestions(quizId)
+      .then((questions) => {
+        let i = 0;
+        questions.forEach((q) => {
+          const qInfo: QuestionTemplate = {
+            id: i,
+            question: q.question,
+            answer: q.answer,
+            penalty: answers.answers[i] === q.answer ? 0 : q.penalty,
+          };
+          questionsInfo.push(qInfo);
+          i++;
+        });
+        getQuizDescr(quizId)
+          .then((descr) => {
+            quiz = {
+              id: quizId,
+              introduction: descr,
+              questions: questionsInfo,
+            };
+            resolve({
+              quiz: quiz,
+              score: score,
+              user_answers: answers.answers,
+            });
+          })
+          .catch(reject);
+      })
+      .catch(reject);
+  });
+};
+
+export const getAnswers = (
+  quizId: number,
+  username: string
+): Promise<UserAnswers> => {
+  return new Promise((resolve, reject) => {
+    const db = openDatabase();
+    db.all(
+      `SELECT * FROM answers
+         WHERE username = ? AND quiz = ${quizId}
+         ORDER BY question;`,
+      [username],
+      (err, rows) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+        const answers = {
+          id: quizId,
+          times: new Array(),
+          ids: new Array(),
+          answers: new Array(),
         };
-        questionsInfo.push(qInfo);
-        i++;
-      });
-    });
+        rows.forEach((row) => {
+          answers.times.push(row.time);
+          answers.ids.push(row.question);
+          answers.answers.push(row.answer);
+        });
+        resolve(answers);
+      }
+    );
   });
 };
