@@ -2,15 +2,21 @@ import createError from "http-errors";
 import express from "express";
 import cookieParser from "cookie-parser";
 import session from "express-session";
-import { verifyUser } from "./auth";
+import { verifyUser, logout } from "./auth";
 import csurf from "csurf";
 import path from "path";
-import { addQuiz, getDescr, getQuestionsSafe, getQuizDescr } from "./quiz";
+import {
+  getDescr,
+  getQuestionsSafe,
+  getQuizDescr,
+  quizzesDone,
+  addQuiz,
+} from "./quiz";
 import { standardCatch } from "./utils";
 import { QuizTemplate } from "../templates/QuizTemplate";
 import bodyParser from "body-parser";
 import template from "../templates/ExampleTemplate";
-import { addScore, getAnswers, verifyScore } from "./score";
+import { addScore, getAnswers, verifyScore, getQuizesDone } from "./score";
 
 // tslint:disable-next-line: no-var-requires
 const connectSqlite = require("connect-sqlite3");
@@ -57,8 +63,9 @@ app.use(
   })
 );
 
-addQuiz(template);
-addQuiz(template);
+// addQuiz(template);
+// addQuiz(template);
+// addQuiz(template);
 
 app.get("/", (req, res) => {
   if (!req.session || !req.session.user) {
@@ -71,17 +78,22 @@ app.get("/", (req, res) => {
 });
 
 app.get("/home", (req, res) => {
-  if (!req.session || !req.session.user) {
+  if (!req.session || !req.session.user || req.session.user === undefined) {
     res.redirect("/login");
   } else {
-    let quizzes;
+    // console.log(req.session.user);
     getDescr()
-      .then((q) => {
-        quizzes = q;
-        res.render("home", {
-          quizzes: quizzes,
-          username: req.session?.user,
-        });
+      .then((quizzes) => {
+        const done: boolean[] = new Array();
+        quizzesDone(req.session.user, quizzes, done, quizzes.length).then(
+          () => {
+            res.render("home", {
+              quizzes: quizzes,
+              username: req.session.user,
+              done: done,
+            });
+          }
+        );
       })
       .catch(standardCatch);
   }
@@ -168,9 +180,10 @@ app.post("/answers", (req, res) => {
   const time = (Date.now() - req.session.timeStart) / 1000;
   addScore(req.body, req.session.user, req.body.id, time)
     .then(() => {
-      console.log("score added");
       req.session.timeStart = null;
+      const quiz = req.session.quiz;
       req.session.quiz = null;
+      res.redirect("/history/" + quiz);
     })
     .catch((err) => {
       console.log(err.message);
@@ -182,6 +195,7 @@ app.post("/history/:quizId", (req, res) => {
     res.redirect("/login");
   } else {
     // console.log(req.session.quiz);
+    console.log("post clicked " + req.body.quizId);
     res.redirect("/history/" + req.body.quizId);
   }
 });
@@ -190,13 +204,62 @@ app.get("/history/:quizId", (req, res) => {
   if (!req.session || !req.session.user) {
     res.redirect("/login");
   } else {
-    getAnswers(req.body.quizId, req.session.user).then((answers) => {
-      verifyScore(answers, req.body.quizId).then((score) => {
-        console.log(score);
+    console.log("get history " + req.params.quizId);
+    getAnswers(+req.params.quizId, req.session.user)
+      .then((answers) => {
+        verifyScore(answers, +req.params.quizId)
+          .then((score) => {
+            console.log(score);
+            res.render("quiz_history", {
+              quiz: score.quiz,
+              score: score.score,
+              user_answers: score.user_answers,
+              username: req.session.user,
+            });
+          })
+          .catch((err) => {
+            console.log(err);
+          });
       })
-    res.redirect("/history/" + req.body.quizId);
+      .catch((err) => {
+        console.log(err);
+      });
   }
 });
+
+app.get("/history/", (req, res) => {
+  if (!req.session || !req.session.user) {
+    res.redirect("/login");
+  } else {
+    getQuizesDone(req.session.user)
+      .then((quizzes) => {
+        // console.log(quizzes);
+        res.render("history", {
+          quizzes: quizzes,
+          username: req.session?.user,
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+});
+
+app.post("/logout", (req, res) => {
+  if (req.session?.user) {
+    logout(req.session.user);
+  }
+  res.redirect("/login");
+});
+
+app.post("/giveup", (req, res) => {
+  if (req.session?.user) {
+    req.session.timeStart = null;
+    req.session.quiz = null;
+    res.redirect("/home");
+  }
+});
+
 // app.post("/submit", (req, res, next) => {});
 
 // // catch 404 and forward to error handler

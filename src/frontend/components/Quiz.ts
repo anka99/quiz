@@ -14,7 +14,6 @@ import {
   QUIZ_ACTIVE,
   SCORES_WINDOW,
 } from "../tools/types.js";
-import ScoresWindow from "../windows/ScoresWindow.js";
 import Scores from "./Scores.js";
 
 class Quiz {
@@ -74,12 +73,10 @@ class Quiz {
       this.rerender(1, QUIZ_ACTIVE, this.changeQuestionsTimers(1))
     );
 
-    this.giveUpButton = new Button(
-      "giveup",
-      "giveup",
-      "give up",
-      this.rerender(0, QUIZ_GIVENUP, this.stopTimers)
-    );
+    this.giveUpButton = new Button("giveup", "giveup", "give up", () => {
+      this.rerender(0, QUIZ_GIVENUP, this.stopTimers)();
+      Scores.sendGiveUp(this.id);
+    });
 
     this.finishQuizButton = new Button("finish", "finish", "finish", () => {
       this.rerender(0, QUIZ_FINISHED, this.stopTimers)();
@@ -179,9 +176,9 @@ class Quiz {
           time,
           this.restart
         );
-        rendered.appendChild(finishedWindow.render());
-        rendered.appendChild(finishedWindow.renderSaveRawButton());
-        rendered.appendChild(finishedWindow.renderSaveStatsButton());
+        // rendered.appendChild(finishedWindow.render());
+        // rendered.appendChild(finishedWindow.renderSaveRawButton());
+        // rendered.appendChild(finishedWindow.renderSaveStatsButton());
         break;
       }
       case SCORES_WINDOW: {

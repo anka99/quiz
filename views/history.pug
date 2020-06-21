@@ -14,19 +14,19 @@ html
 
             h1="Hello " + username + "! Your previous results: "
 
-        a(href="home/") Back
+        //- a(href="home/") Back
 
         div
 
-            
             ul
+
                 each  quiz in quizzes
 
                     li
 
-                        form(method='POST', action="/history/" + quiz.id)
-                            button(type="submit") #{quiz.introduction}
-                            input(type="hidden" name="quizId" value=quiz.id) 
+                        form(method='POST', action="/history/" + quiz.quiz)
+                            button(type="submit") #{quiz.description}
+                            input(type="hidden" name="quizId" value=quiz.quiz) 
 
         div
 

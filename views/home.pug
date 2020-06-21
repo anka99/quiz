@@ -20,12 +20,15 @@ html
 
             
             ul
-                each  quiz in quizzes
+                each  quiz, index in quizzes
 
                     li
 
                         form(method='POST', action="/quiz/" + quiz.id)
-                            button(type="submit") #{quiz.introduction}
+                            if done[index]
+                                button(type="submit" disabled="yes") #{quiz.description}
+                            else
+                                button(type="submit") #{quiz.description}
                             input(type="hidden" name="quizId" value=quiz.id) 
 
         div

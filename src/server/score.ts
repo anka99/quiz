@@ -12,6 +12,7 @@ import { QuestionTemplate } from "../templates/QuestionTemplate";
 import { QuizTemplate } from "../templates/QuizTemplate";
 import { getQuestionsSafe, getQuestions, getQuizDescr } from "./quiz";
 import { UserScore } from "../templates/UserScore";
+import { rejects } from "assert";
 
 const addAnswer = (
   db: sqlite.Database,
@@ -104,7 +105,7 @@ export const verifyScore = (
 ): Promise<UserScore> => {
   return new Promise((resolve, reject) => {
     const questionsInfo = new Array<QuestionTemplate>();
-    const score = answers.times.reduce((prev, curr, index, arr) => {
+    let score = answers.times.reduce((prev, curr, index, arr) => {
       return prev + curr;
     });
     let quiz: QuizTemplate;
@@ -118,6 +119,7 @@ export const verifyScore = (
             answer: q.answer,
             penalty: answers.answers[i] === q.answer ? 0 : q.penalty,
           };
+          score += answers.answers[i] === q.answer ? 0 : q.penalty;
           questionsInfo.push(qInfo);
           i++;
         });
@@ -168,6 +170,31 @@ export const getAnswers = (
           answers.answers.push(row.answer);
         });
         resolve(answers);
+      }
+    );
+  });
+};
+
+export const getQuizesDone = (
+  username: string
+): Promise<[number, string][]> => {
+  return new Promise((resolve, reject) => {
+    const db = openDatabase();
+    db.all(
+      `SELECT quiz, description
+    FROM
+    answers JOIN quiz
+    ON answers.quiz = quiz.id
+    WHERE username = ?
+    GROUP BY quiz
+    ORDER BY quiz;`,
+      [username],
+      (err, rows) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+        resolve(rows);
       }
     );
   });

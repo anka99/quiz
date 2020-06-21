@@ -2,7 +2,6 @@ import { QuizTemplate } from "../templates/QuizTemplate";
 import * as sqlite from "sqlite3";
 import { openDatabase, standardCatch } from "./utils";
 import { QuestionTemplate } from "../templates/QuestionTemplate";
-import IdQuiz from "./IdQuiz";
 
 const getId = (db): Promise<number> => {
   return new Promise((resolve, reject) => {
@@ -156,7 +155,7 @@ export const getQuestionsSafe = (
   });
 };
 
-export const getDescr = (): Promise<IdQuiz[]> => {
+export const getDescr = (): Promise<Object[]> => {
   return new Promise((resolve, reject) => {
     const db = openDatabase();
     db.all(`SELECT * FROM quiz;`, (err, rows) => {
@@ -164,12 +163,7 @@ export const getDescr = (): Promise<IdQuiz[]> => {
         reject(err);
         return;
       }
-      const quizzes = new Array<IdQuiz>();
-      rows.forEach((row) => {
-        const quiz = new IdQuiz(row.id, row.description);
-        quizzes.push(quiz);
-      });
-      resolve(quizzes);
+      resolve(rows);
     }).close();
   });
 };
@@ -188,5 +182,73 @@ export const getQuizDescr = (quizId: number): Promise<string> => {
       }
       resolve(row.description);
     });
+  });
+};
+
+export const getQuizesNotDone = (username: string): Promise<Object[]> => {
+  return new Promise((resolve, reject) => {
+    const db = openDatabase();
+    db.all(
+      `SELECT quiz.id as id, description
+    FROM
+    answers JOIN quiz
+    ON answers.quiz = quiz.id
+    WHERE (username, quiz) NOT IN (SELECT username, quiz FROM answers) as a
+    GROUP BY quiz
+    ORDER BY quiz;`,
+      [username],
+      (err, rows) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+        resolve(rows);
+      }
+    );
+  });
+};
+
+export const quizDone = (username: string, quiz: number): Promise<boolean> => {
+  const db = openDatabase();
+  return new Promise((resolve, reject) => {
+    db.all(
+      `SELECT * FROM ANSWERS WHERE username = ? AND quiz = ${quiz};`,
+      [username],
+      (err, rows) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+        console.log(rows);
+        if (rows.length > 0) {
+          resolve(true);
+          return;
+        }
+        resolve(false);
+      }
+    );
+  });
+};
+
+export const quizzesDone = (
+  username: string,
+  quizzes,
+  done: boolean[],
+  quizzesLeft: number
+): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    if (quizzesLeft > 0) {
+      const quiz = quizzes[quizzesLeft - 1];
+      quizDone(username, quiz.id)
+        .then((b) => {
+          done.unshift(b);
+          quizzesDone(username, quizzes, done, quizzesLeft - 1)
+            .then(resolve)
+            .catch(reject);
+        })
+        .catch(reject);
+    } else {
+      resolve();
+    }
   });
 };

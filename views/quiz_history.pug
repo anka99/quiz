@@ -1,0 +1,46 @@
+html
+
+    head
+
+        title= title
+
+        style
+
+            include style.css
+
+    body
+
+        div
+
+            h1="Hello " + username + "! Your Results from " + quiz.introduction + ":"
+
+        //- a(href="home/") Back
+
+        div
+
+            table
+
+                tr
+
+                    th Question number
+                    th Question
+                    th Correct answer
+                    th Your answer
+                    th Your penalty
+
+                each  question, index in quiz.questions
+
+                    tr
+
+                        td #{question.id}
+                        td #{question.question}
+                        td #{question.answer}
+                        td #{user_answers[index]}
+                        td #{question.penalty}
+
+                     
+
+        div
+
+            form(method='POST', action="/logout")
+                button(type="submit") Log out 

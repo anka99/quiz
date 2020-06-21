@@ -16,6 +16,7 @@ export const verifyUser = (
           reject(err.message);
           return;
         }
+        db.close();
         if (rows === null || rows.length === 0) {
           resolve(false);
         }
@@ -25,6 +26,24 @@ export const verifyUser = (
           resolve(true);
         }
         resolve(false);
+      }
+    );
+  });
+};
+
+export const logout = (username: string): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    const db = openDatabase();
+    db.run(
+      `DELETE FROM sessions WHERE sess LIKE '%"user":"' || ? || '"%'`,
+      [username],
+      (err) => {
+        db.close();
+        if (err) {
+          reject(err);
+          return;
+        }
+        resolve();
       }
     );
   });
