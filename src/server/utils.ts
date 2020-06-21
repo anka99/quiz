@@ -26,29 +26,24 @@ export const beginTransaction = (db: sqlite.Database): Promise<void> => {
 };
 
 export const commit = (db: sqlite.Database): Promise<void> => {
-  console.log("commit");
   return new Promise((resolve, reject) => {
     db.run(`COMMIT;`, (err) => {
       if (err) {
         reject(err.message);
         return;
       }
-      console.log("commit");
       resolve();
     });
-    // .close();
   });
 };
 
 export const commitFun = (db: sqlite.Database) => () => {
-  console.log("commitFun");
   commit(db).catch((message) => {
     console.log(message);
   });
 };
 
 export const rollback = (db: sqlite.Database): Promise<void> => {
-  console.log("rollback");
   return new Promise((resolve, reject) => {
     db.run(`ROLLBACK;`, (err) => {
       if (err) {
@@ -56,7 +51,7 @@ export const rollback = (db: sqlite.Database): Promise<void> => {
         return;
       }
       resolve();
-    }).close();
+    });
   });
 };
 

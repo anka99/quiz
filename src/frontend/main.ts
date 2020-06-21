@@ -8,7 +8,6 @@ fetch("/quiz", {
 })
   .then((rawData) => rawData.json())
   .then((data) => {
-    console.log("dupa");
     console.log(data);
     const quiz = new Quiz(data);
     quiz.render();

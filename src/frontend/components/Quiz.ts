@@ -35,12 +35,13 @@ class Quiz {
   private timer: Timer;
   private entryWindow: EntryWindow;
   private giveUpWindow: GiveUpWindow;
+  private start: boolean;
 
   constructor(template: QuizTemplate) {
     this.id = template.id;
     this.introduction = template.introduction;
     this.questions = new Array(template.questions.length);
-    this.state = new State(0, ENTRY_WINDOW);
+    this.state = new State(0, QUIZ_ACTIVE);
     this.entryWindow = new EntryWindow();
     this.timer = new Timer("timer-place");
     this.giveUpWindow = new GiveUpWindow();
@@ -76,6 +77,7 @@ class Quiz {
     this.giveUpButton = new Button("giveup", "giveup", "give up", () => {
       this.rerender(0, QUIZ_GIVENUP, this.stopTimers)();
       Scores.sendGiveUp(this.id);
+      this.start = true;
     });
 
     this.finishQuizButton = new Button("finish", "finish", "finish", () => {
@@ -96,6 +98,8 @@ class Quiz {
       "scores",
       this.rerender(0, SCORES_WINDOW, () => {})
     );
+
+    this.start = true;
   }
 
   private startTimers = () => {
@@ -190,6 +194,10 @@ class Quiz {
         break;
       }
       case QUIZ_ACTIVE: {
+        if (this.start) {
+          this.startTimers();
+          this.start = false;
+        }
         rendered.appendChild(
           this.answers.renderPreviousAnswer(this.state.currentQuestion)
         );

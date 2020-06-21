@@ -45,8 +45,6 @@ app.use(
   })
 );
 
-console.log(__dirname);
-
 // app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "../")));
@@ -146,7 +144,6 @@ app.get("/quiz", async (req, res, next) => {
     res.redirect("/login");
   } else {
     const quizId = req.session.quiz;
-    console.log(quizId);
     getQuestionsSafe(quizId)
       .then((questions) => {
         getQuizDescr(quizId)
@@ -176,7 +173,6 @@ app.get("/quiz", async (req, res, next) => {
 app.use(bodyParser.json());
 
 app.post("/answers", (req, res) => {
-  console.log(req.body);
   const time = (Date.now() - req.session.timeStart) / 1000;
   addScore(req.body, req.session.user, req.body.id, time)
     .then(() => {
@@ -195,7 +191,6 @@ app.post("/history/:quizId", (req, res) => {
     res.redirect("/login");
   } else {
     // console.log(req.session.quiz);
-    console.log("post clicked " + req.body.quizId);
     res.redirect("/history/" + req.body.quizId);
   }
 });
@@ -204,12 +199,10 @@ app.get("/history/:quizId", (req, res) => {
   if (!req.session || !req.session.user) {
     res.redirect("/login");
   } else {
-    console.log("get history " + req.params.quizId);
     getAnswers(+req.params.quizId, req.session.user)
       .then((answers) => {
         verifyScore(answers, +req.params.quizId)
           .then((score) => {
-            console.log(score);
             res.render("quiz_history", {
               quiz: score.quiz,
               score: score.score,
@@ -233,7 +226,6 @@ app.get("/history/", (req, res) => {
   } else {
     getQuizesDone(req.session.user)
       .then((quizzes) => {
-        // console.log(quizzes);
         res.render("history", {
           quizzes: quizzes,
           username: req.session?.user,
