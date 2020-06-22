@@ -11,7 +11,7 @@
     "runserver": "node public/server/server.js",
     "lint": "tslint -p tsconfig.server.json",
     "createdb": "node public/server/database/createdb.js",
-    "test": "mocha --require ts-node/register server/tests/*"
+    "test": "mocha --require ts-node/register /tests/*"
   },
   "repository": {
     "type": "git",
@@ -33,15 +33,23 @@
     "csurf": "^1.11.0",
     "express": "^4.17.1",
     "express-session": "^1.17.1",
-    "npm": "^6.14.5",
     "path": "^0.12.7",
     "pug": "^3.0.0",
+    "save-dev": "0.0.1-security",
     "sha256": "^0.2.0",
     "sqlite3": "^4.2.0"
   },
   "devDependencies": {
-    "@types/csurf": "^1.9.36",
-    "@types/express-session": "^1.17.0",
-    "@types/node": "^14.0.13"
+    "@types/chai": "^4.2.11",
+    "@types/mocha": "^7.0.2",
+    "@types/selenium-webdriver": "^3.0.17",
+    "chai": "^4.2.0",
+    "install": "^0.13.0",
+    "mocha": "^8.0.1",
+    "mocha-webdriver": "^0.2.8",
+    "npm": "^6.14.5",
+    "selenium-webdriver": "^3.6.0",
+    "ts-node": "^8.10.2",
+    "typescript": "^3.9.5"
   }
 }

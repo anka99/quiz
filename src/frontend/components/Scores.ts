@@ -69,7 +69,13 @@ class Scores {
       headers: {
         "Content-Type": "application/json",
       },
-    });
+    })
+      .then(() => {
+        window.location.pathname = "/home";
+      })
+      .catch((err) => {
+        console.log(err.message);
+      });
   }
 }
 

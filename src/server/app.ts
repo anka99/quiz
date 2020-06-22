@@ -17,6 +17,7 @@ import { QuizTemplate } from "../templates/QuizTemplate";
 import bodyParser from "body-parser";
 import template from "../templates/ExampleTemplate";
 import { addScore, getAnswers, verifyScore, getQuizesDone } from "./score";
+import { getAverage } from "./stats";
 
 // tslint:disable-next-line: no-var-requires
 const connectSqlite = require("connect-sqlite3");
@@ -68,6 +69,8 @@ app.use(
 app.get("/", (req, res) => {
   if (!req.session || !req.session.user) {
     res.redirect("/login");
+  } else if (!req.session.quiz) {
+    res.redirect("/home");
   } else {
     res.sendFile("public/quiz.html", {
       root: ".",
@@ -79,7 +82,6 @@ app.get("/home", (req, res) => {
   if (!req.session || !req.session.user || req.session.user === undefined) {
     res.redirect("/login");
   } else {
-    // console.log(req.session.user);
     getDescr()
       .then((quizzes) => {
         const done: boolean[] = new Array();
@@ -106,11 +108,11 @@ app.post("/logout", (req, res) => {
   }
 });
 
-app.get("/login", (req, res, next) => {
-  res.render("login");
+app.get("/login", csrfProtection, (req, res, next) => {
+  res.render("login", { csrfToken: req.csrfToken() });
 });
 
-app.post("/login", (req, res) => {
+app.post("/login", csrfProtection, (req, res) => {
   const username: string = req.body.username;
   const password: string = req.body.password;
   if (username && password) {
@@ -203,12 +205,19 @@ app.get("/history/:quizId", (req, res) => {
       .then((answers) => {
         verifyScore(answers, +req.params.quizId)
           .then((score) => {
-            res.render("quiz_history", {
-              quiz: score.quiz,
-              score: score.score,
-              user_answers: score.user_answers,
-              username: req.session.user,
-            });
+            getAverage(+req.params.quizId)
+              .then((averages) => {
+                res.render("quiz_history", {
+                  quiz: score.quiz,
+                  score: score.score,
+                  user_answers: score.user_answers,
+                  username: req.session.user,
+                  averages: averages,
+                });
+              })
+              .catch((err) => {
+                console.log(err);
+              });
           })
           .catch((err) => {
             console.log(err);
@@ -252,22 +261,20 @@ app.post("/giveup", (req, res) => {
   }
 });
 
-// app.post("/submit", (req, res, next) => {});
+// catch 404 and forward to error handler
+app.use((req, res, next) => {
+  next(createError(404));
+});
 
-// // catch 404 and forward to error handler
-// app.use((req, res, next) => {
-//   next(createError(404));
-// });
+// error handler
+app.use((err, req, res, next) => {
+  // set locals, only providing error in development
+  res.locals.message = err.message;
+  res.locals.error = req.app.get("env") === "development" ? err : {};
 
-// // error handler
-// app.use((err, req, res, next) => {
-//   // set locals, only providing error in development
-//   res.locals.message = err.message;
-//   res.locals.error = req.app.get("env") === "development" ? err : {};
-
-//   // render the error page
-//   res.status(err.status || 500);
-//   res.render("error");
-// });
+  // render the error page
+  res.status(err.status || 500);
+  res.render("error");
+});
 
 export default app;

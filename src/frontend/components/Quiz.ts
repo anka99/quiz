@@ -167,9 +167,9 @@ class Quiz {
         break;
       }
       case QUIZ_GIVENUP: {
-        rendered.appendChild(this.giveUpWindow.render());
-        rendered.appendChild(this.restartButton.render());
-        rendered.appendChild(this.scoresButton.render());
+        // rendered.appendChild(this.giveUpWindow.render());
+        // rendered.appendChild(this.restartButton.render());
+        // rendered.appendChild(this.scoresButton.render());
         break;
       }
       case QUIZ_FINISHED: {

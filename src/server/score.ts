@@ -64,7 +64,6 @@ const addAnswers = (
           reject(err);
         });
     } else {
-      console.log("answers added");
       resolve();
     }
   });

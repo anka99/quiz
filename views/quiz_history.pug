@@ -27,6 +27,7 @@ html
                     th Correct answer
                     th Your answer
                     th Your penalty
+                    th Average time spent
 
                 each  question, index in quiz.questions
 
@@ -37,6 +38,7 @@ html
                         td #{question.answer}
                         td #{user_answers[index]}
                         td #{question.penalty}
+                        td #{averages[index]}
 
                      
 

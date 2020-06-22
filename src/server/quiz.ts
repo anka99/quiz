@@ -91,7 +91,6 @@ const addQuestions = (
 
 export const addQuiz = (quiz: QuizTemplate) => {
   const db = openDatabase();
-  console.log("adding quiz");
   addDescription(db, quiz.introduction)
     .then(() => {
       getId(db)
@@ -219,7 +218,6 @@ export const quizDone = (username: string, quiz: number): Promise<boolean> => {
           reject(err);
           return;
         }
-        console.log(rows);
         if (rows.length > 0) {
           resolve(true);
           return;

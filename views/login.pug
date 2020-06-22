@@ -14,6 +14,6 @@ html
         form(method='POST', action="/login/")
             p Log in 
             input(type="text", placeholder="username", name="username")
-            //- input(type="hidden" name="_csrf" value=csrfToken)
+            input(type="hidden" name="_csrf" value=csrfToken)
             input(type="password", placeholder="password", name="password")
             button(type="submit") log in
