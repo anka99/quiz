@@ -1,4 +1,3 @@
-import { UserScore } from "../templates/UserScore";
 import { openDatabase } from "./utils";
 
 export const getTopFive = (quizId: number): Promise<[string, number][]> => {
@@ -41,7 +40,7 @@ export const getAverage = (quizId: number): Promise<[number][]> => {
       (err, rows) => {
         db.close();
         if (err) {
-          resolve(err);
+          reject(err);
           return;
         }
         const result = new Array();

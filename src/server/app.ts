@@ -1,8 +1,8 @@
 import createError from "http-errors";
-import express from "express";
+import express, { request } from "express";
 import cookieParser from "cookie-parser";
 import session from "express-session";
-import { verifyUser, logout } from "./auth";
+import { verifyUser, logout, changePassword } from "./auth";
 import csurf from "csurf";
 import path from "path";
 import {
@@ -17,7 +17,8 @@ import { QuizTemplate } from "../templates/QuizTemplate";
 import bodyParser from "body-parser";
 import template from "../templates/ExampleTemplate";
 import { addScore, getAnswers, verifyScore, getQuizesDone } from "./score";
-import { getAverage } from "./stats";
+import { getAverage, getTopFive } from "./stats";
+import { nextTick } from "process";
 
 // tslint:disable-next-line: no-var-requires
 const connectSqlite = require("connect-sqlite3");
@@ -62,10 +63,6 @@ app.use(
   })
 );
 
-// addQuiz(template);
-// addQuiz(template);
-// addQuiz(template);
-
 app.get("/", (req, res) => {
   if (!req.session || !req.session.user) {
     res.redirect("/login");
@@ -78,7 +75,7 @@ app.get("/", (req, res) => {
   }
 });
 
-app.get("/home", (req, res) => {
+app.get("/home", csrfProtection, (req, res, next) => {
   if (!req.session || !req.session.user || req.session.user === undefined) {
     res.redirect("/login");
   } else {
@@ -91,11 +88,14 @@ app.get("/home", (req, res) => {
               quizzes: quizzes,
               username: req.session.user,
               done: done,
+              csrfToken: req.csrfToken(),
             });
           }
         );
       })
-      .catch(standardCatch);
+      .catch(() => {
+        next(createError(404));
+      });
   }
 });
 
@@ -112,7 +112,7 @@ app.get("/login", csrfProtection, (req, res, next) => {
   res.render("login", { csrfToken: req.csrfToken() });
 });
 
-app.post("/login", csrfProtection, (req, res) => {
+app.post("/login", csrfProtection, (req, res, next) => {
   const username: string = req.body.username;
   const password: string = req.body.password;
   if (username && password) {
@@ -126,17 +126,16 @@ app.post("/login", csrfProtection, (req, res) => {
         }
       })
       .catch((message) => {
-        console.log(message);
+        next(createError(404));
       });
   }
 });
 
-app.post("/quiz/:quizId", (req, res) => {
+app.post("/quiz/:quizId", csrfProtection, (req, res) => {
   if (!req.session || !req.session.user) {
     res.redirect("/login");
   } else {
     req.session.quiz = req.body.quizId;
-    // console.log(req.session.quiz);
     res.redirect("/");
   }
 });
@@ -161,20 +160,20 @@ app.get("/quiz", async (req, res, next) => {
           .catch((message) => {
             console.log(message);
             res.status(501);
-            // create error
+            next(createError(404));
           });
       })
       .catch((err) => {
         console.log(err.message);
         res.status(502);
-        // create error
+        next(createError(404));
       });
   }
 });
 
 app.use(bodyParser.json());
 
-app.post("/answers", (req, res) => {
+app.post("/answers", (req, res, next) => {
   const time = (Date.now() - req.session.timeStart) / 1000;
   addScore(req.body, req.session.user, req.body.id, time)
     .then(() => {
@@ -185,6 +184,7 @@ app.post("/answers", (req, res) => {
     })
     .catch((err) => {
       console.log(err.message);
+      next(createError(404));
     });
 });
 
@@ -192,12 +192,11 @@ app.post("/history/:quizId", (req, res) => {
   if (!req.session || !req.session.user) {
     res.redirect("/login");
   } else {
-    // console.log(req.session.quiz);
     res.redirect("/history/" + req.body.quizId);
   }
 });
 
-app.get("/history/:quizId", (req, res) => {
+app.get("/history/:quizId", (req, res, next) => {
   if (!req.session || !req.session.user) {
     res.redirect("/login");
   } else {
@@ -207,29 +206,39 @@ app.get("/history/:quizId", (req, res) => {
           .then((score) => {
             getAverage(+req.params.quizId)
               .then((averages) => {
-                res.render("quiz_history", {
-                  quiz: score.quiz,
-                  score: score.score,
-                  user_answers: score.user_answers,
-                  username: req.session.user,
-                  averages: averages,
-                });
+                getTopFive(+req.params.quizId)
+                  .then((top) => {
+                    res.render("quiz_history", {
+                      quiz: score.quiz,
+                      score: score.score,
+                      user_answers: score.user_answers,
+                      username: req.session.user,
+                      averages: averages,
+                      top: top,
+                    });
+                  })
+                  .catch((err) => {
+                    next(createError(404));
+                  });
               })
               .catch((err) => {
                 console.log(err);
+                next(createError(404));
               });
           })
           .catch((err) => {
             console.log(err);
+            next(createError(404));
           });
       })
       .catch((err) => {
         console.log(err);
+        next(createError(404));
       });
   }
 });
 
-app.get("/history/", (req, res) => {
+app.get("/history/", (req, res, next) => {
   if (!req.session || !req.session.user) {
     res.redirect("/login");
   } else {
@@ -242,6 +251,7 @@ app.get("/history/", (req, res) => {
       })
       .catch((err) => {
         console.log(err);
+        next(createError(404));
       });
   }
 });
@@ -258,6 +268,29 @@ app.post("/giveup", (req, res) => {
     req.session.timeStart = null;
     req.session.quiz = null;
     res.redirect("/home");
+  }
+});
+
+app.post("/changepassword", csrfProtection, (req, res, next) => {
+  if (!request.session || !request.session.user) {
+    res.redirect("/login");
+  } else {
+    const old_password: string = req.body.old_password;
+    const new_password: string = req.body.new_password;
+    const username = req.session.user;
+    if (old_password) {
+      changePassword(username, new_password).then(() => {
+        res.redirect("/changepassword");
+      });
+    }
+  }
+});
+
+app.get("/changepassword", csrfProtection, (req, res, next) => {
+  if (!req.session || !req.session.user) {
+    res.redirect("/login");
+  } else {
+    res.render("change_password", { csrfToken: req.csrfToken() });
   }
 });
 

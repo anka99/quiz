@@ -1,6 +1,6 @@
 import { QuizTemplate } from "../templates/QuizTemplate";
 import * as sqlite from "sqlite3";
-import { openDatabase, standardCatch } from "./utils";
+import { openDatabase } from "./utils";
 import { QuestionTemplate } from "../templates/QuestionTemplate";
 
 const getId = (db): Promise<number> => {
@@ -76,7 +76,9 @@ const addQuestions = (
         question.penalty
       )
         .then(() => {
-          return addQuestions(db, quizId, questions, questionsLeft - 1);
+          addQuestions(db, quizId, questions, questionsLeft - 1)
+            .then(resolve)
+            .catch(reject);
         })
         .catch((err) => {
           console.log(err.message);
@@ -89,27 +91,30 @@ const addQuestions = (
   });
 };
 
-export const addQuiz = (quiz: QuizTemplate) => {
-  const db = openDatabase();
-  addDescription(db, quiz.introduction)
-    .then(() => {
-      getId(db)
-        .then((quizId) => {
-          addQuestions(db, quizId, quiz.questions, quiz.questions.length)
-            .then(() => {
-              db.close();
-            })
-            .catch((err) => {
-              console.log(err);
-            });
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+export const addQuiz = (quiz: QuizTemplate): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    const db = openDatabase();
+    addDescription(db, quiz.introduction)
+      .then(() => {
+        getId(db)
+          .then((quizId) => {
+            addQuestions(db, quizId, quiz.questions, quiz.questions.length)
+              .then(() => {
+                db.close();
+                resolve();
+              })
+              .catch((err) => {
+                reject(err);
+              });
+          })
+          .catch((err) => {
+            reject(err);
+          });
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
 };
 
 export const getQuestions = (quizId: number): Promise<QuestionTemplate[]> => {
@@ -118,6 +123,7 @@ export const getQuestions = (quizId: number): Promise<QuestionTemplate[]> => {
     db.all(
       `SELECT * FROM questions WHERE quiz = ${quizId} ORDER BY id;`,
       (err, rows) => {
+        db.close();
         if (err) {
           reject(err);
           return;
@@ -158,6 +164,7 @@ export const getDescr = (): Promise<Object[]> => {
   return new Promise((resolve, reject) => {
     const db = openDatabase();
     db.all(`SELECT * FROM quiz;`, (err, rows) => {
+      db.close();
       if (err) {
         reject(err);
         return;
@@ -171,6 +178,7 @@ export const getQuizDescr = (quizId: number): Promise<string> => {
   return new Promise((resolve, reject) => {
     const db = openDatabase();
     db.get(`SELECT * from quiz WHERE id = ${quizId};`, (err, row) => {
+      db.close();
       if (err) {
         reject(err.message);
         return;
@@ -197,6 +205,7 @@ export const getQuizesNotDone = (username: string): Promise<Object[]> => {
     ORDER BY quiz;`,
       [username],
       (err, rows) => {
+        db.close();
         if (err) {
           reject(err);
           return;
@@ -214,6 +223,7 @@ export const quizDone = (username: string, quiz: number): Promise<boolean> => {
       `SELECT * FROM ANSWERS WHERE username = ? AND quiz = ${quiz};`,
       [username],
       (err, rows) => {
+        db.close();
         if (err) {
           reject(err);
           return;

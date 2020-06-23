@@ -11,7 +11,7 @@
     "runserver": "node public/server/server.js",
     "lint": "tslint -p tsconfig.server.json",
     "createdb": "node public/server/database/createdb.js",
-    "test": "mocha --require ts-node/register /tests/*"
+    "test": "rm quiz.db && npm run createdb && mocha --require ts-node/register --timeout 40000 ./tests/*"
   },
   "repository": {
     "type": "git",
@@ -25,31 +25,46 @@
   },
   "homepage": "https://github.com/anka99/quiz#readme",
   "dependencies": {
-    "@types/express": "^4.17.6",
-    "bulma": "^0.8.2",
-    "connect-sqlite": "0.0.1",
+    "@types/chai": "^4.2.11",
+    "@types/mocha": "^7.0.2",
+    "@types/node": "^14.0.13",
+    "@types/selenium-webdriver": "^3.0.17",
+    "@types/sha256": "^0.2.0",
+    "@types/sqlite3": "^3.1.6",
+    "@types/supertest": "^2.0.9",
+    "chai": "^4.2.0",
     "connect-sqlite3": "^0.9.11",
     "cookie-parser": "^1.4.5",
     "csurf": "^1.11.0",
-    "express": "^4.17.1",
+    "debug": "~2.6.9",
+    "express": "~4.16.1",
     "express-session": "^1.17.1",
-    "path": "^0.12.7",
-    "pug": "^3.0.0",
-    "save-dev": "0.0.1-security",
-    "sha256": "^0.2.0",
-    "sqlite3": "^4.2.0"
-  },
-  "devDependencies": {
-    "@types/chai": "^4.2.11",
-    "@types/mocha": "^7.0.2",
-    "@types/selenium-webdriver": "^3.0.17",
-    "chai": "^4.2.0",
-    "install": "^0.13.0",
+    "http-errors": "~1.6.3",
     "mocha": "^8.0.1",
     "mocha-webdriver": "^0.2.8",
-    "npm": "^6.14.5",
+    "morgan": "~1.9.1",
+    "path": "^0.12.7",
+    "pug": "2.0.0-beta11",
     "selenium-webdriver": "^3.6.0",
+    "sha256": "^0.2.0",
+    "sqlite3": "^4.2.0",
+    "supertest": "^4.0.2",
     "ts-node": "^8.10.2",
     "typescript": "^3.9.5"
+  },
+  "watch": {
+    "build": {
+      "patterns": [
+        "."
+      ],
+      "extensions": "ts"
+    }
+  },
+  "devDependencies": {
+    "@types/cookie-parser": "^1.4.2",
+    "@types/csurf": "^1.9.36",
+    "@types/express-session": "^1.17.0",
+    "@types/http-errors": "^1.6.3",
+    "faker": "^4.1.0"
   }
 }

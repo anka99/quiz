@@ -1,49 +1,9 @@
 import * as sqlite from "sqlite3";
 import { encrypt, openDatabase } from "../utils";
+import { addQuiz } from "../quiz";
+import template from "../../templates/ExampleTemplate";
 
 sqlite.verbose();
-
-// const createColumnString = (table: string, types: string[]) => {
-//   let header = `CREATE TABLE ` + table + ` (`;
-//   types.forEach((type) => {
-//     header += ` ? ` + type + ` , `;
-//   });
-//   header += `PRIMARY KEY( ? ));`;
-// };
-
-// const createTable = (
-//   db: sqlite.Database,
-//   table: string,
-//   columns: string[],
-//   types: string[]
-// ) => {
-//   return new Promise((resolve, reject) => {
-//     db.all(
-//       `SELECT COUNT(*) AS cnt FROM sqlite_master WHERE type='table' and name=?;`,
-//       [table],
-//       (selectErr, rows) => {
-//         if (selectErr) {
-//           reject(selectErr);
-//           return;
-//         }
-
-//         if (rows[0].cnt === 1) {
-//           console.log("Users already exist.");
-//           resolve();
-//           return;
-//         }
-//         console.log(createColumnString(table, types));
-//         db.run(createColumnString(table, types), columns, (err) => {
-//           if (err) {
-//             reject(err.message);
-//             return;
-//           }
-//           resolve();
-//         });
-//       }
-//     );
-//   });
-// };
 
 const createUsersTable = (db: sqlite.Database): Promise<void> => {
   return new Promise((resolve, reject) => {
@@ -217,15 +177,33 @@ const database = openDatabase();
 
 createUsersTable(database)
   .then(() => {
-    addUser(database, "admin", "admin")
+    addUser(database, "admin", "admin");
+    addUser(database, "user1", "user1");
+    addUser(database, "user2", "user2")
       .then(() => {
         createQuizTable(database)
           .then(() => {
             createQuestionsTable(database)
               .then(() => {
-                createAnswersTable(database).catch((message) => {
-                  console.log(message);
-                });
+                createAnswersTable(database)
+                  .then(() => {
+                    database.close();
+                    addQuiz(template)
+                      .then(() => {
+                        addQuiz(template).catch((err) => {
+                          console.log(err.message);
+                        });
+                      })
+                      .catch((err) => {
+                        console.log(err.message);
+                      });
+                  })
+                  .catch((err) => {
+                    console.log(err.message);
+                  })
+                  .catch((message) => {
+                    console.log(message);
+                  });
               })
               .catch((message) => {
                 console.log(message);

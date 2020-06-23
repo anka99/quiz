@@ -40,7 +40,24 @@ html
                         td #{question.penalty}
                         td #{averages[index]}
 
-                     
+        div 
+
+            h2="Overall best scores:"
+
+            table
+
+                tr
+
+                    th Username
+                    th Time (seconds)
+
+                each  best, index in top
+
+                    tr
+
+                        td #{best[0]}
+                        
+                        td #{best[1]}
 
         div
 

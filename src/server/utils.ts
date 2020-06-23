@@ -28,6 +28,7 @@ export const beginTransaction = (db: sqlite.Database): Promise<void> => {
 export const commit = (db: sqlite.Database): Promise<void> => {
   return new Promise((resolve, reject) => {
     db.run(`COMMIT;`, (err) => {
+      db.close();
       if (err) {
         reject(err.message);
         return;
@@ -45,6 +46,7 @@ export const commitFun = (db: sqlite.Database) => () => {
 
 export const rollback = (db: sqlite.Database): Promise<void> => {
   return new Promise((resolve, reject) => {
+    db.close();
     db.run(`ROLLBACK;`, (err) => {
       if (err) {
         reject(err.message);

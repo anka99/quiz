@@ -14,7 +14,16 @@ html
 
             h1="Hello " + username + "! A bunch of new quizzes for you: "
 
-        a(href="history/") History
+        form(action="history/")
+
+            input(type="submit" value="History")
+
+        form(action="changepassword/")
+
+             input(type="submit" value="Change password")
+
+
+
 
         div
 
@@ -29,7 +38,8 @@ html
                                 button(type="submit" disabled="yes") #{quiz.description}
                             else
                                 button(type="submit") #{quiz.description}
-                            input(type="hidden" name="quizId" value=quiz.id) 
+                            input(type="hidden" name="quizId" value=quiz.id)
+                            input(type="hidden" name="_csrf" value=csrfToken) 
 
         div
 

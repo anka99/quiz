@@ -48,3 +48,24 @@ export const logout = (username: string): Promise<void> => {
     );
   });
 };
+
+export const changePassword = (
+  username: string,
+  password: string
+): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    const db = openDatabase();
+    db.run(
+      `UPDATE users SET password=? WHERE username=?;`,
+      [encrypt(username, password), username],
+      (err) => {
+        db.close();
+        if (err) {
+          reject(err);
+          return;
+        }
+        resolve();
+      }
+    );
+  });
+};

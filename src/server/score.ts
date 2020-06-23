@@ -1,18 +1,10 @@
 import { UserAnswers } from "../templates/UserAnswers";
-import {
-  openDatabase,
-  beginTransaction,
-  rollbackFun,
-  commitFun,
-  rollback,
-  commit,
-} from "./utils";
+import { openDatabase, beginTransaction, rollback, commit } from "./utils";
 import * as sqlite from "sqlite3";
 import { QuestionTemplate } from "../templates/QuestionTemplate";
 import { QuizTemplate } from "../templates/QuizTemplate";
-import { getQuestionsSafe, getQuestions, getQuizDescr } from "./quiz";
+import { getQuestions, getQuizDescr } from "./quiz";
 import { UserScore } from "../templates/UserScore";
-import { rejects } from "assert";
 
 const addAnswer = (
   db: sqlite.Database,
@@ -153,6 +145,7 @@ export const getAnswers = (
          ORDER BY question;`,
       [username],
       (err, rows) => {
+        db.close();
         if (err) {
           reject(err);
           return;
@@ -189,6 +182,7 @@ export const getQuizesDone = (
     ORDER BY quiz;`,
       [username],
       (err, rows) => {
+        db.close();
         if (err) {
           reject(err);
           return;
