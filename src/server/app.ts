@@ -16,7 +16,13 @@ import { standardCatch } from "./utils";
 import { QuizTemplate } from "../templates/QuizTemplate";
 import bodyParser from "body-parser";
 import template from "../templates/ExampleTemplate";
-import { addScore, getAnswers, verifyScore, getQuizesDone } from "./score";
+import {
+  addScore,
+  getAnswers,
+  verifyScore,
+  getQuizesDone,
+  correctAnsLen,
+} from "./score";
 import { getAverage, getTopFive } from "./stats";
 import { nextTick } from "process";
 
@@ -155,6 +161,7 @@ app.get("/quiz", async (req, res, next) => {
               questions: questions,
             };
             req.session.timeStart = Date.now();
+            req.session.quizLen = questions.length;
             res.status(200).json(quiz);
           })
           .catch((message) => {
@@ -175,17 +182,21 @@ app.use(bodyParser.json());
 
 app.post("/answers", (req, res, next) => {
   const time = (Date.now() - req.session.timeStart) / 1000;
-  addScore(req.body, req.session.user, req.body.id, time)
-    .then(() => {
-      req.session.timeStart = null;
-      const quiz = req.session.quiz;
-      req.session.quiz = null;
-      res.redirect("/history/" + quiz);
-    })
-    .catch((err) => {
-      console.log(err.message);
-      next(createError(404));
-    });
+  if (!correctAnsLen(req.body, req.session.quizLen)) {
+    next(createError(404));
+  } else {
+    addScore(req.body, req.session.user, req.body.id, time)
+      .then(() => {
+        req.session.timeStart = null;
+        const quiz = req.session.quiz;
+        req.session.quiz = null;
+        res.redirect("/history/" + quiz);
+      })
+      .catch((err) => {
+        console.log(err.message);
+        next(createError(404));
+      });
+  }
 });
 
 app.post("/history/:quizId", (req, res) => {

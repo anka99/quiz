@@ -21,7 +21,7 @@ export const beginTransaction = (db: sqlite.Database): Promise<void> => {
         return;
       }
       resolve();
-    }).close();
+    });
   });
 };
 

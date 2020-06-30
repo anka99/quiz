@@ -192,3 +192,23 @@ export const getQuizesDone = (
     );
   });
 };
+
+export const correctAnsLen = (
+  answers: UserAnswers,
+  length: number
+): boolean => {
+  for (let i = 0; i < answers.ids.length - 1; i++) {
+    if (
+      answers.ids[i + 1] - answers.ids[i] !== 1 ||
+      isNaN(answers.times[i]) ||
+      isNaN(answers.times[i + 1])
+    ) {
+      return false;
+    }
+  }
+  return (
+    answers.answers.length === length &&
+    answers.times.length === length &&
+    answers.ids.length === length
+  );
+};

@@ -139,7 +139,7 @@ export const getQuestions = (quizId: number): Promise<QuestionTemplate[]> => {
         });
         resolve(questions);
       }
-    ).close();
+    );
   });
 };
 
@@ -170,7 +170,7 @@ export const getDescr = (): Promise<Object[]> => {
         return;
       }
       resolve(rows);
-    }).close();
+    });
   });
 };
 
