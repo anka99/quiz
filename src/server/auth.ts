@@ -1,4 +1,5 @@
 import { openDatabase, encrypt } from "./utils";
+import * as sqlite from "sqlite3";
 
 export const verifyUser = (
   username: string,
@@ -35,7 +36,7 @@ export const verifyUser = (
 
 export const logout = (username: string): Promise<void> => {
   return new Promise((resolve, reject) => {
-    const db = openDatabase();
+    const db = new sqlite.Database("sessions");
     db.run(
       `DELETE FROM sessions WHERE sess LIKE '%"user":"' || ? || '"%'`,
       [username],

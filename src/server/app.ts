@@ -275,17 +275,33 @@ app.post("/giveup", (req, res) => {
 });
 
 app.post("/changepassword", csrfProtection, (req, res, next) => {
-  if (!request.session || !request.session.user) {
+  if (!req.session || !req.session.user) {
     res.redirect("/login");
   } else {
     const old_password: string = req.body.old_password;
     const new_password: string = req.body.new_password;
     const username = req.session.user;
-    if (old_password) {
-      changePassword(username, new_password).then(() => {
-        res.redirect("/login");
+    verifyUser(username, old_password)
+      .then((correct) => {
+        if (!correct) {
+          console.log("Incorrect credentials");
+          next();
+        } else {
+          changePassword(username, new_password)
+            .then(() => {
+              logout(username);
+              res.redirect("/login");
+            })
+            .catch((err) => {
+              console.log(err);
+              next(createError(404));
+            });
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        next(createError(404));
       });
-    }
   }
 });
 
