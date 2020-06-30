@@ -14,8 +14,6 @@ html
 
             h1="Hello " + username + "! Your previous results: "
 
-        //- a(href="home/") Back
-
         div
 
             ul
@@ -30,5 +28,5 @@ html
 
         div
 
-            form(method='POST', action="/logout")
-                button(type="submit") Log out 
+            form(method='GET', action="/home/")
+                button(type="submit") Back

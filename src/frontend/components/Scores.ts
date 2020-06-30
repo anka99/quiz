@@ -34,6 +34,7 @@ class Scores {
   };
 
   public static sendQuizScore(
+    csrfToken,
     quizId: number,
     questions: Question[],
     answers: AnswerContainer,
@@ -53,6 +54,7 @@ class Scores {
       body: JSON.stringify(score),
       headers: {
         "Content-Type": "application/json",
+        "CSRF-Token": csrfToken,
       },
     })
       .then(() => {
@@ -63,11 +65,12 @@ class Scores {
       });
   }
 
-  public static sendGiveUp(quizId: number) {
+  public static sendGiveUp(csrfToken, quizId: number) {
     fetch("/giveup", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "CSRF-Token": csrfToken,
       },
     })
       .then(() => {

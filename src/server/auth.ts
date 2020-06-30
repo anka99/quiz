@@ -19,11 +19,13 @@ export const verifyUser = (
         db.close();
         if (rows === null || rows.length === 0) {
           resolve(false);
+          return;
         }
         if (
           encrypt(username, password).localeCompare(rows[0]?.password) === 0
         ) {
           resolve(true);
+          return;
         }
         resolve(false);
       }

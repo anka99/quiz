@@ -36,8 +36,10 @@ class Quiz {
   private entryWindow: EntryWindow;
   private giveUpWindow: GiveUpWindow;
   private start: boolean;
+  private csrfToken;
 
-  constructor(template: QuizTemplate) {
+  constructor(template: QuizTemplate, csrfToken) {
+    this.csrfToken = csrfToken;
     this.id = template.id;
     this.introduction = template.introduction;
     this.questions = new Array(template.questions.length);
@@ -76,13 +78,14 @@ class Quiz {
 
     this.giveUpButton = new Button("giveup", "giveup", "give up", () => {
       this.rerender(0, QUIZ_GIVENUP, this.stopTimers)();
-      Scores.sendGiveUp(this.id);
+      Scores.sendGiveUp(csrfToken, this.id);
       this.start = true;
     });
 
     this.finishQuizButton = new Button("finish", "finish", "finish", () => {
       this.rerender(0, QUIZ_FINISHED, this.stopTimers)();
       Scores.sendQuizScore(
+        csrfToken,
         this.id,
         this.questions,
         this.answers,

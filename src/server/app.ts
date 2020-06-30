@@ -16,7 +16,6 @@ import {
   correctAnsLen,
 } from "./score";
 import { getAverage, getTopFive } from "./stats";
-import { nextTick } from "process";
 
 // tslint:disable-next-line: no-var-requires
 const connectSqlite = require("connect-sqlite3");
@@ -138,7 +137,7 @@ app.post("/quiz/:quizId", csrfProtection, (req, res) => {
   }
 });
 
-app.get("/quiz", async (req, res, next) => {
+app.get("/quiz", csrfProtection, async (req, res, next) => {
   if (!req.session || !req.session.user) {
     res.redirect("/login");
   } else {
@@ -154,6 +153,7 @@ app.get("/quiz", async (req, res, next) => {
             };
             req.session.timeStart = Date.now();
             req.session.quizLen = questions.length;
+            res.setHeader("CSRF-Header", req.csrfToken());
             res.status(200).json(quiz);
           })
           .catch((message) => {
@@ -172,7 +172,7 @@ app.get("/quiz", async (req, res, next) => {
 
 app.use(bodyParser.json());
 
-app.post("/answers", (req, res, next) => {
+app.post("/answers", csrfProtection, (req, res, next) => {
   const time = (Date.now() - req.session.timeStart) / 1000;
   if (!correctAnsLen(req.body, req.session.quizLen)) {
     next(createError(404));
@@ -283,7 +283,7 @@ app.post("/changepassword", csrfProtection, (req, res, next) => {
     const username = req.session.user;
     if (old_password) {
       changePassword(username, new_password).then(() => {
-        res.redirect("/changepassword");
+        res.redirect("/login");
       });
     }
   }
