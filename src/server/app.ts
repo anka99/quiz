@@ -5,17 +5,9 @@ import session from "express-session";
 import { verifyUser, logout, changePassword } from "./auth";
 import csurf from "csurf";
 import path from "path";
-import {
-  getDescr,
-  getQuestionsSafe,
-  getQuizDescr,
-  quizzesDone,
-  addQuiz,
-} from "./quiz";
-import { standardCatch } from "./utils";
+import { getDescr, getQuestionsSafe, getQuizDescr, quizzesDone } from "./quiz";
 import { QuizTemplate } from "../templates/QuizTemplate";
 import bodyParser from "body-parser";
-import template from "../templates/ExampleTemplate";
 import {
   addScore,
   getAnswers,

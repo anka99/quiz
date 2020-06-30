@@ -14,13 +14,13 @@ html
 
             h1="Hello " + username + "! A bunch of new quizzes for you: "
 
-        form(action="history/")
+        form(method='GET' action="history/")
 
-            input(type="submit" value="History")
+            button(type="submit") History
 
-        form(action="changepassword/")
+        form(method='GET' action="changepassword/")
 
-             input(type="submit" value="Change password")
+             button(type="submit") Change password
 
 
 

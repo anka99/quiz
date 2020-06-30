@@ -59,7 +59,8 @@ describe("Quiz tests", () => {
 
     await logIn();
 
-    await driver.findElement(By.xpath("/html/body/form[2]/input")).click();
+    // enter change password
+    await driver.findElement(By.xpath("/html/body/form[2]/button")).click();
 
     // change password
     await driver
