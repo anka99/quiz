@@ -180,7 +180,12 @@ app.use(bodyParser.json());
 
 app.post("/answers", csrfProtection, (req, res, next) => {
   const time = (Date.now() - req.session.timeStart) / 1000;
-  if (!correctAnsLen(req.body, req.session.quizLen)) {
+  if (
+    !correctAnsLen(req.body, req.session.quizLen) ||
+    !req.session.user ||
+    !req.session.quiz ||
+    req.session.quiz !== req.body.id
+  ) {
     next(createError(404));
   } else {
     addScore(req.body, req.session.user, req.body.id, time)
