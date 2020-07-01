@@ -5,7 +5,13 @@ import session from "express-session";
 import { verifyUser, logout, changePassword } from "./auth";
 import csurf from "csurf";
 import path from "path";
-import { getDescr, getQuestionsSafe, getQuizDescr, quizzesDone } from "./quiz";
+import {
+  getDescr,
+  getQuestionsSafe,
+  getQuizDescr,
+  quizzesDone,
+  quizDone,
+} from "./quiz";
 import { QuizTemplate } from "../templates/QuizTemplate";
 import bodyParser from "body-parser";
 import {

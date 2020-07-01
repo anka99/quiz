@@ -11,6 +11,7 @@
     "runserver": "node public/server/server.js",
     "lint": "tslint -p tsconfig.server.json",
     "createdb": "node public/server/database/createdb.js",
+    "headless": "node public/server/server.js &",
     "test": "rm quiz.db && npm run createdb && mocha --require ts-node/register --timeout 40000 ./tests/*"
   },
   "repository": {

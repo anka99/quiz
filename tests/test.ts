@@ -80,7 +80,7 @@ describe("Quiz tests", () => {
 
     const login = await driver.findElement(By.xpath("/html/body/div/h1"));
 
-    expect(login).to.exist;
+    expect(login !== undefined).to.be.true;
   });
 
   it("should NOT be able to do the same test twice", async function () {

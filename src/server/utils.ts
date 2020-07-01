@@ -15,7 +15,7 @@ export const closeDatabase = (db: sqlite.Database) => {
 
 export const beginTransaction = (db: sqlite.Database): Promise<void> => {
   return new Promise((resolve, reject) => {
-    db.run(`BEGIN EXCLUSIVE;`, (err) => {
+    db.run(`BEGIN TRANSACTION;`, (err) => {
       if (err) {
         reject(err.message);
         return;
